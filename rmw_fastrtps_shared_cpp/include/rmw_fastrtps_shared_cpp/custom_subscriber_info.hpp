@@ -168,9 +168,10 @@ public:
   // Provide handlers to perform an action when a
   // new event from this listener has ocurred
   void
-  setCallback(void * executor_context,
+  setCallback(
+    const void * executor_context,
     Event_callback callback,
-    void * subscription_handle)
+    const void * subscription_handle)
   {
     event_handle_ = {executor_context, subscription_handle, callback};
     hook_set_ = true;

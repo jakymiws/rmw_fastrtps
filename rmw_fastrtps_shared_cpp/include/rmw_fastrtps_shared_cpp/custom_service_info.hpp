@@ -175,9 +175,9 @@ public:
   // new event from this listener has ocurred
   void
   setCallback(
-    void * executor_context,
+    const void * executor_context,
     Event_callback callback,
-    void * service_handle)
+    const void * service_handle)
   {
     event_handle_ = {executor_context, service_handle, callback};
     hook_set_ = true;

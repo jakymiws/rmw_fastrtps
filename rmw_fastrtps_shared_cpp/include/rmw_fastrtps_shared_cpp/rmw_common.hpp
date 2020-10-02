@@ -395,33 +395,33 @@ __rmw_get_subscriptions_info_by_topic(
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
 __rmw_set_subscription_callback(
-  void * executor_context,
+  const void * executor_context,
   Event_callback callback,
-  void * subscription_handle,
+  const void * subscription_handle,
   void * rmw_subscription);
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
 __rmw_set_service_callback(
-  void * executor_context,
+  const void * executor_context,
   Event_callback callback,
-  void * service_handle,
+  const void * service_handle,
   void * rmw_service);
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
 __rmw_set_client_callback(
-  void * executor_context,
+  const void * executor_context,
   Event_callback callback,
-  void * client_handle,
+  const void * client_handle,
   void * rmw_client);
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
 __rmw_set_guard_condition_callback(
-  void * executor_context,
+  const void * executor_context,
   Event_callback callback,
-  void * guard_condition_handle,
+  const void * guard_condition_handle,
   void * rmw_guard_condition);
 
 }  // namespace rmw_fastrtps_shared_cpp

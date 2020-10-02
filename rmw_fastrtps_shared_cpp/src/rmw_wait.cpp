@@ -248,9 +248,9 @@ __rmw_wait(
 
 rmw_ret_t
 __rmw_set_subscription_callback(
-  void * executor_context,
+  const void * executor_context,
   Event_callback callback,
-  void * subscription_handle,
+  const void * subscription_handle,
   void * rmw_subscription)
 {
   auto custom_subscriber_info = static_cast<CustomSubscriberInfo *>(rmw_subscription);
@@ -263,9 +263,9 @@ __rmw_set_subscription_callback(
 
 rmw_ret_t
 __rmw_set_service_callback(
-  void * executor_context,
+  const void * executor_context,
   Event_callback callback,
-  void * service_handle,
+  const void * service_handle,
   void * rmw_service)
 {
   auto custom_service_info = static_cast<CustomServiceInfo *>(rmw_service);
@@ -278,9 +278,9 @@ __rmw_set_service_callback(
 
 rmw_ret_t
 __rmw_set_client_callback(
-  void * executor_context,
+  const void * executor_context,
   Event_callback callback,
-  void * client_handle,
+  const void * client_handle,
   void * rmw_client)
 {
   auto custom_client_info = static_cast<CustomServiceInfo *>(rmw_client);
@@ -293,9 +293,9 @@ __rmw_set_client_callback(
 
 rmw_ret_t
 __rmw_set_guard_condition_callback(
-  void * executor_context,
+  const void * executor_context,
   Event_callback callback,
-  void * guard_condition_handle,
+  const void * guard_condition_handle,
   void * rmw_guard_condition)
 {
   auto guard_condition = static_cast<GuardCondition *>(rmw_guard_condition);

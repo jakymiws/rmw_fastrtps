@@ -34,4 +34,61 @@ rmw_wait(
     eprosima_fastrtps_identifier, subscriptions, guard_conditions, services, clients, events,
     wait_set, wait_timeout);
 }
+
+rmw_ret_t
+rmw_set_subscription_callback(
+  void * executor_context,
+  Event_callback callback,
+  void * subscription_handle,
+  void * rmw_subscription)
+{
+  return rmw_fastrtps_shared_cpp::__rmw_set_subscription_callback(
+    executor_context,
+    callback,
+    subscription_handle,
+    rmw_subscription);
+}
+
+rmw_ret_t
+rmw_set_service_callback(
+  void * executor_context,
+  Event_callback callback,
+  void * service_handle,
+  void * rmw_service)
+{
+  return rmw_fastrtps_shared_cpp::__rmw_set_service_callback(
+    executor_context,
+    callback,
+    service_handle,
+    rmw_service);
+}
+
+rmw_ret_t
+rmw_set_client_callback(
+  void * executor_context,
+  Event_callback callback,
+  void * client_handle,
+  void * rmw_client)
+{
+  return rmw_fastrtps_shared_cpp::__rmw_set_client_callback(
+    executor_context,
+    callback,
+    client_handle,
+    rmw_client);
+}
+
+rmw_ret_t
+rmw_set_guard_condition_callback(
+  void * executor_context,
+  Event_callback callback,
+  void * guard_condition_handle,
+  void * rmw_guard_condition)
+{
+  return rmw_fastrtps_shared_cpp::__rmw_set_guard_condition_callback(
+    executor_context,
+    callback,
+    guard_condition_handle,
+    rmw_guard_condition);
+}
+
 }  // extern "C"

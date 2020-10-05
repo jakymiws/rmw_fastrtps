@@ -35,26 +35,24 @@ public:
   void
   trigger()
   {
-    std::lock_guard<std::mutex> lock(internalMutex_);
-
-    if (conditionMutex_ != nullptr) {
-      std::unique_lock<std::mutex> clock(*conditionMutex_);
-      // the change to hasTriggered_ needs to be mutually exclusive with
-      // rmw_wait() which checks hasTriggered() and decides if wait() needs to
-      // be called
-      hasTriggered_ = true;
-      clock.unlock();
-      conditionVariable_->notify_one();
-    } else {
-      hasTriggered_ = true;
+    if(use_callback_) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
     }
+    else {
+      std::lock_guard<std::mutex> lock(internalMutex_);
 
-    if(hook_set_) {
-      for(uint64_t i = 0; i <= unread_count_; i++) {
-        event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
+      if (conditionMutex_ != nullptr) {
+        std::unique_lock<std::mutex> clock(*conditionMutex_);
+        // the change to hasTriggered_ needs to be mutually exclusive with
+        // rmw_wait() which checks hasTriggered() and decides if wait() needs to
+        // be called
+        hasTriggered_ = true;
+        clock.unlock();
+        conditionVariable_->notify_one();
+      } else {
+        hasTriggered_ = true;
       }
-      unread_count_ = 0;
-    } else {
+
       unread_count_++;
     }
   }
@@ -96,7 +94,14 @@ public:
     const void * guard_condition_handle)
   {
     event_handle_ = {executor_context, guard_condition_handle, callback};
-    hook_set_ = true;
+
+    // Push events arrived before setting the event_handle_
+    for(uint64_t i = 0; i < unread_count_; i++) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
+    }
+
+    unread_count_ = 0;
+    use_callback_ = true;
   }
 
 private:
@@ -106,7 +111,7 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
   EventHandle event_handle_{nullptr, nullptr, nullptr};
-  std::atomic_bool hook_set_{false};
+  std::atomic_bool use_callback_{false};
   uint64_t unread_count_ = 0;
 };
 

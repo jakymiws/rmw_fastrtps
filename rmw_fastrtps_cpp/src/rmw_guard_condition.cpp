@@ -42,4 +42,18 @@ rmw_destroy_guard_condition(rmw_guard_condition_t * guard_condition)
   return rmw_fastrtps_shared_cpp::__rmw_destroy_guard_condition(
     guard_condition);
 }
+
+rmw_ret_t
+rmw_set_guard_condition_callback(
+  const void * executor_context,
+  Event_callback callback,
+  const void * guard_condition_handle,
+  void * rmw_guard_condition)
+{
+  return rmw_fastrtps_shared_cpp::__rmw_set_guard_condition_callback(
+    executor_context,
+    callback,
+    guard_condition_handle,
+    rmw_guard_condition);
+}
 }  // extern "C"

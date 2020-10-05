@@ -84,17 +84,11 @@ public:
   void
   onNewDataMessage(eprosima::fastrtps::Subscriber * sub) final
   {
-    update_unread_count(sub);
-
-    // Add the service to the event queue
-    // Check if we can comment the above `update_unread_count`
-    // when using the events executor, to avoid the locking of the mutex.
-    if(hook_set_) {
-      for(uint64_t i = 0; i <= unread_count_; i++) {
-        event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SUBSCRIPTION_EVENT });
-      }
-      unread_count_ = 0;
+    // Callback: add the subscription event to the event queue
+    if(use_callback_) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SUBSCRIPTION_EVENT });
     } else {
+      update_unread_count(sub);
       unread_count_++;
     }
   }
@@ -174,7 +168,14 @@ public:
     const void * subscription_handle)
   {
     event_handle_ = {executor_context, subscription_handle, callback};
-    hook_set_ = true;
+
+    // Push events arrived before setting the event_handle_
+    for(uint64_t i = 0; i < unread_count_; i++) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SUBSCRIPTION_EVENT });
+    }
+
+    unread_count_ = 0;
+    use_callback_ = true;
   }
 
 private:
@@ -196,7 +197,7 @@ private:
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
   EventHandle event_handle_{nullptr, nullptr, nullptr};
-  std::atomic_bool hook_set_;
+  std::atomic_bool use_callback_{false};
   uint64_t unread_count_ = 0;
 };
 

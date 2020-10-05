@@ -113,11 +113,8 @@ public:
         }
 
         // Add the service to the event queue
-        if(hook_set_) {
-          for(uint64_t i = 0; i <= unread_count_; i++) {
-            event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SERVICE_EVENT });
-          }
-          unread_count_ = 0;
+        if(use_callback_) {
+          event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SERVICE_EVENT });
         } else {
           unread_count_++;
         }
@@ -180,7 +177,14 @@ public:
     const void * service_handle)
   {
     event_handle_ = {executor_context, service_handle, callback};
-    hook_set_ = true;
+
+    // Push events arrived before setting the event_handle_
+    for(uint64_t i = 0; i < unread_count_; i++) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SERVICE_EVENT });
+    }
+
+    unread_count_ = 0;
+    use_callback_ = true;
   }
 
 private:
@@ -192,7 +196,7 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
   EventHandle event_handle_{nullptr, nullptr, nullptr};
-  std::atomic_bool hook_set_{false};
+  std::atomic_bool use_callback_{false};
   uint64_t unread_count_ = 0;
 };
 

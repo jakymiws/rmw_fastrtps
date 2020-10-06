@@ -176,15 +176,24 @@ public:
     Event_callback callback,
     const void * service_handle)
   {
-    event_handle_ = {executor_context, service_handle, callback};
+    if(executor_context && service_handle && callback)
+    {
+      event_handle_ = {executor_context, service_handle, callback};
+      use_callback_ = true;
+    }
+    else {
+       // Unset callback: If any of the pointers is NULL, do not use callback.
+      use_callback_ = false;
+      return;
+    }
 
     // Push events arrived before setting the event_handle_
     for(uint64_t i = 0; i < unread_count_; i++) {
       event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SERVICE_EVENT });
     }
 
+    // Reset unread count
     unread_count_ = 0;
-    use_callback_ = true;
   }
 
 private:

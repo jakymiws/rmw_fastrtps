@@ -94,7 +94,16 @@ public:
     const void * guard_condition_handle,
     bool use_previous_events)
   {
-    event_handle_ = {executor_context, guard_condition_handle, callback};
+    if(executor_context && guard_condition_handle && callback)
+    {
+      event_handle_ = {executor_context, guard_condition_handle, callback};
+      use_callback_ = true;
+    }
+    else {
+       // Unset callback: If any of the pointers is NULL, do not use callback.
+      use_callback_ = false;
+      return;
+    }
 
     if (use_previous_events) {
       // Push events arrived before setting the event_handle_
@@ -103,8 +112,8 @@ public:
       }
     }
 
+    // Reset unread count
     unread_count_ = 0;
-    use_callback_ = true;
   }
 
 private:

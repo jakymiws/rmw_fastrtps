@@ -48,12 +48,14 @@ rmw_set_guard_condition_callback(
   const void * executor_context,
   Event_callback callback,
   const void * guard_condition_handle,
-  void * rmw_guard_condition)
+  void * rmw_guard_condition,
+  bool use_previous_events)
 {
   return rmw_fastrtps_shared_cpp::__rmw_set_guard_condition_callback(
     executor_context,
     callback,
     guard_condition_handle,
-    rmw_guard_condition);
+    rmw_guard_condition,
+    use_previous_events);
 }
 }  // extern "C"

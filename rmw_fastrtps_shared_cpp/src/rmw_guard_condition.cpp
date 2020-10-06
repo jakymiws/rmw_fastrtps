@@ -47,13 +47,15 @@ __rmw_set_guard_condition_callback(
   const void * executor_context,
   Event_callback callback,
   const void * guard_condition_handle,
-  void * rmw_guard_condition)
+  void * rmw_guard_condition,
+  bool use_previous_events)
 {
   auto guard_condition = static_cast<GuardCondition *>(rmw_guard_condition);
   guard_condition->setCallback(
     executor_context,
     callback,
-    guard_condition_handle);
+    guard_condition_handle,
+    use_previous_events);
   return RMW_RET_OK;
 }
 }  // namespace rmw_fastrtps_shared_cpp

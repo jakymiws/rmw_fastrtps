@@ -91,13 +91,16 @@ public:
   setCallback(
     const void * executor_context,
     Event_callback callback,
-    const void * guard_condition_handle)
+    const void * guard_condition_handle,
+    bool use_previous_events)
   {
     event_handle_ = {executor_context, guard_condition_handle, callback};
 
-    // Push events arrived before setting the event_handle_
-    for(uint64_t i = 0; i < unread_count_; i++) {
-      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
+    if (use_previous_events) {
+      // Push events arrived before setting the event_handle_
+      for(uint64_t i = 0; i < unread_count_; i++) {
+        event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
+      }
     }
 
     unread_count_ = 0;

@@ -334,13 +334,13 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
 }
 
 rmw_ret_t
-rmw_set_client_callback(
+rmw_client_set_events_executor_callback(
   const void * executor_context,
-  Event_callback callback,
+  ExecutorEventCallback callback,
   const void * client_handle,
   void * rmw_client)
 {
-  return rmw_fastrtps_shared_cpp::__rmw_set_client_callback(
+  return rmw_fastrtps_shared_cpp::__rmw_client_set_events_executor_callback(
     executor_context,
     callback,
     client_handle,

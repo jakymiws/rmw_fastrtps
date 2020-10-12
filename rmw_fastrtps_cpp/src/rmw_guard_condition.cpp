@@ -44,14 +44,14 @@ rmw_destroy_guard_condition(rmw_guard_condition_t * guard_condition)
 }
 
 rmw_ret_t
-rmw_set_guard_condition_callback(
+rmw_guard_condition_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
   const void * guard_condition_handle,
   void * rmw_guard_condition,
   bool use_previous_events)
 {
-  return rmw_fastrtps_shared_cpp::__rmw_set_guard_condition_callback(
+  return rmw_fastrtps_shared_cpp::__rmw_guard_condition_set_events_executor_callback(
     executor_context,
     callback,
     guard_condition_handle,

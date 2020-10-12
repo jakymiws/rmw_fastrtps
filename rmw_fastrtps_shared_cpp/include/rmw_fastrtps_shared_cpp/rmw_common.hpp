@@ -418,7 +418,7 @@ __rmw_client_set_events_executor_callback(
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
-__rmw_set_guard_condition_callback(
+__rmw_guard_condition_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
   const void * guard_condition_handle,

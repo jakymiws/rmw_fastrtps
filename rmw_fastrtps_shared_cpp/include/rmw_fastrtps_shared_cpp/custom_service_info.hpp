@@ -30,6 +30,7 @@
 #include "fastrtps/subscriber/SubscriberListener.h"
 #include "fastrtps/subscriber/SampleInfo.h"
 
+#include "rcutils/event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
@@ -110,6 +111,13 @@ public:
           list.push_back(request);
           list_has_data_.store(true);
         }
+
+        // Add the service to the event queue
+        if(use_callback_) {
+          event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SERVICE_EVENT });
+        } else {
+          unread_count_++;
+        }
       }
     }
   }
@@ -160,6 +168,34 @@ public:
     return list_has_data_.load();
   }
 
+  // Provide handlers to perform an action when a
+  // new event from this listener has ocurred
+  void
+  setCallback(
+    const void * executor_context,
+    Event_callback callback,
+    const void * service_handle)
+  {
+    if(executor_context && service_handle && callback)
+    {
+      event_handle_ = {executor_context, service_handle, callback};
+      use_callback_ = true;
+    }
+    else {
+       // Unset callback: If any of the pointers is NULL, do not use callback.
+      use_callback_ = false;
+      return;
+    }
+
+    // Push events arrived before setting the event_handle_
+    for(uint64_t i = 0; i < unread_count_; i++) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SERVICE_EVENT });
+    }
+
+    // Reset unread count
+    unread_count_ = 0;
+  }
+
 private:
   CustomServiceInfo * info_;
   std::mutex internalMutex_;
@@ -167,6 +203,10 @@ private:
   std::atomic_bool list_has_data_;
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
+
+  EventHandle event_handle_{nullptr, nullptr, nullptr};
+  std::atomic_bool use_callback_{false};
+  uint64_t unread_count_ = 0;
 };
 
 class ServicePubListener : public eprosima::fastrtps::PublisherListener

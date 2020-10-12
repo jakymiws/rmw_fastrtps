@@ -93,4 +93,19 @@ __rmw_destroy_service(
   RCUTILS_CAN_RETURN_WITH_ERROR_OF(RMW_RET_ERROR);  // on completion
   return ret;
 }
+
+rmw_ret_t
+__rmw_set_service_callback(
+  const void * executor_context,
+  Event_callback callback,
+  const void * service_handle,
+  void * rmw_service)
+{
+  auto custom_service_info = static_cast<CustomServiceInfo *>(rmw_service);
+  custom_service_info->listener_->setCallback(
+    executor_context,
+    callback,
+    service_handle);
+  return RMW_RET_OK;
+}
 }  // namespace rmw_fastrtps_shared_cpp

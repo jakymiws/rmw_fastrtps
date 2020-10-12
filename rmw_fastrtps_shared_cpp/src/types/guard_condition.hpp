@@ -22,6 +22,7 @@
 #include <mutex>
 #include <utility>
 
+#include "rcutils/event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
 
 class GuardCondition
@@ -34,18 +35,25 @@ public:
   void
   trigger()
   {
-    std::lock_guard<std::mutex> lock(internalMutex_);
+    if(use_callback_) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
+    }
+    else {
+      std::lock_guard<std::mutex> lock(internalMutex_);
 
-    if (conditionMutex_ != nullptr) {
-      std::unique_lock<std::mutex> clock(*conditionMutex_);
-      // the change to hasTriggered_ needs to be mutually exclusive with
-      // rmw_wait() which checks hasTriggered() and decides if wait() needs to
-      // be called
-      hasTriggered_ = true;
-      clock.unlock();
-      conditionVariable_->notify_one();
-    } else {
-      hasTriggered_ = true;
+      if (conditionMutex_ != nullptr) {
+        std::unique_lock<std::mutex> clock(*conditionMutex_);
+        // the change to hasTriggered_ needs to be mutually exclusive with
+        // rmw_wait() which checks hasTriggered() and decides if wait() needs to
+        // be called
+        hasTriggered_ = true;
+        clock.unlock();
+        conditionVariable_->notify_one();
+      } else {
+        hasTriggered_ = true;
+      }
+
+      unread_count_++;
     }
   }
 
@@ -77,11 +85,46 @@ public:
     return hasTriggered_.exchange(false);
   }
 
+  // Provide handlers to perform an action when a
+  // new event from this listener has ocurred
+  void
+  setCallback(
+    const void * executor_context,
+    Event_callback callback,
+    const void * guard_condition_handle,
+    bool use_previous_events)
+  {
+    if(executor_context && guard_condition_handle && callback)
+    {
+      event_handle_ = {executor_context, guard_condition_handle, callback};
+      use_callback_ = true;
+    }
+    else {
+       // Unset callback: If any of the pointers is NULL, do not use callback.
+      use_callback_ = false;
+      return;
+    }
+
+    if (use_previous_events) {
+      // Push events arrived before setting the event_handle_
+      for(uint64_t i = 0; i < unread_count_; i++) {
+        event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
+      }
+    }
+
+    // Reset unread count
+    unread_count_ = 0;
+  }
+
 private:
   std::mutex internalMutex_;
   std::atomic_bool hasTriggered_;
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
+
+  EventHandle event_handle_{nullptr, nullptr, nullptr};
+  std::atomic_bool use_callback_{false};
+  uint64_t unread_count_ = 0;
 };
 
 #endif  // TYPES__GUARD_CONDITION_HPP_

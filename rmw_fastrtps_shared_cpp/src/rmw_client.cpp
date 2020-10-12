@@ -80,4 +80,19 @@ __rmw_destroy_client(
   RCUTILS_CAN_RETURN_WITH_ERROR_OF(RMW_RET_ERROR);  // on completion
   return ret;
 }
+
+rmw_ret_t
+__rmw_set_client_callback(
+  const void * executor_context,
+  Event_callback callback,
+  const void * client_handle,
+  void * rmw_client)
+{
+  auto custom_client_info = static_cast<CustomClientInfo *>(rmw_client);
+  custom_client_info->listener_->setCallback(
+    executor_context,
+    callback,
+    client_handle);
+  return RMW_RET_OK;
+}
 }  // namespace rmw_fastrtps_shared_cpp

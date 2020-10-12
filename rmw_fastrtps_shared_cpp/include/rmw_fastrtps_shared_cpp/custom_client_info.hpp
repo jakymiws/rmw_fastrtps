@@ -32,6 +32,7 @@
 #include "fastrtps/publisher/Publisher.h"
 #include "fastrtps/publisher/PublisherListener.h"
 
+#include "rcutils/event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
@@ -107,6 +108,13 @@ public:
             list.emplace_back(std::move(response));
             list_has_data_.store(true);
           }
+
+          // Add the client event to the event queue
+          if(use_callback_) {
+            event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, CLIENT_EVENT });
+          } else {
+            unread_count_++;
+          }
         }
       }
     }
@@ -164,6 +172,34 @@ public:
     info_->response_subscriber_matched_count_.store(publishers_.size());
   }
 
+  // Provide handlers to perform an action when a
+  // new event from this listener has ocurred
+  void
+  setCallback(
+    const void * executor_context,
+    Event_callback callback,
+    const void * client_handle)
+  {
+    if(executor_context && client_handle && callback)
+    {
+      event_handle_ = {executor_context, client_handle, callback};
+      use_callback_ = true;
+    }
+    else {
+       // Unset callback: If any of the pointers is NULL, do not use callback.
+      use_callback_ = false;
+      return;
+    }
+
+    // Push events arrived before setting the event_handle_
+    for(uint64_t i = 0; i < unread_count_; i++) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, CLIENT_EVENT });
+    }
+
+    // Reset unread count
+    unread_count_ = 0;
+  }
+
 private:
   bool popResponse(CustomClientResponse & response) RCPPUTILS_TSA_REQUIRES(internalMutex_)
   {
@@ -183,6 +219,10 @@ private:
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_;
+
+  EventHandle event_handle_{nullptr, nullptr, nullptr};
+  std::atomic_bool use_callback_{false};
+  uint64_t unread_count_ = 0;
 };
 
 class ClientPubListener : public eprosima::fastrtps::PublisherListener

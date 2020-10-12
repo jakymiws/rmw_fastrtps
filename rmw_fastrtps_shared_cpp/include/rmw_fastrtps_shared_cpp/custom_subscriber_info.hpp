@@ -24,6 +24,7 @@
 #include "fastrtps/subscriber/Subscriber.h"
 #include "fastrtps/subscriber/SubscriberListener.h"
 
+#include "rcutils/event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
 
 #include "rmw/impl/cpp/macros.hpp"
@@ -83,7 +84,13 @@ public:
   void
   onNewDataMessage(eprosima::fastrtps::Subscriber * sub) final
   {
-    update_unread_count(sub);
+    // Callback: add the subscription event to the event queue
+    if(use_callback_) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SUBSCRIPTION_EVENT });
+    } else {
+      update_unread_count(sub);
+      unread_count_++;
+    }
   }
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
@@ -152,6 +159,35 @@ public:
     return publishers_.size();
   }
 
+  // Provide handlers to perform an action when a
+  // new event from this listener has ocurred
+  void
+  setCallback(
+    const void * executor_context,
+    Event_callback callback,
+    const void * subscription_handle)
+  {
+    if(executor_context && subscription_handle && callback)
+    {
+      event_handle_ = {executor_context, subscription_handle, callback};
+      use_callback_ = true;
+    }
+    else
+    {
+       // Unset callback: If any of the pointers is NULL, do not use callback.
+      use_callback_ = false;
+      return;
+    }
+
+    // Push events arrived before setting the event_handle_
+    for(uint64_t i = 0; i < unread_count_; i++) {
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SUBSCRIPTION_EVENT });
+    }
+
+    // Reset unread count
+    unread_count_ = 0;
+  }
+
 private:
   mutable std::mutex internalMutex_;
 
@@ -169,6 +205,10 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
+
+  EventHandle event_handle_{nullptr, nullptr, nullptr};
+  std::atomic_bool use_callback_{false};
+  uint64_t unread_count_ = 0;
 };
 
 #endif  // RMW_FASTRTPS_SHARED_CPP__CUSTOM_SUBSCRIBER_INFO_HPP_

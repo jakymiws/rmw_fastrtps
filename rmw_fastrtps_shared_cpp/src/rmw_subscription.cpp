@@ -106,4 +106,19 @@ __rmw_subscription_get_actual_qos(
 
   return RMW_RET_OK;
 }
+
+rmw_ret_t
+__rmw_set_subscription_callback(
+  const void * executor_context,
+  Event_callback callback,
+  const void * subscription_handle,
+  void * rmw_subscription)
+{
+  auto custom_subscriber_info = static_cast<CustomSubscriberInfo *>(rmw_subscription);
+  custom_subscriber_info->listener_->setCallback(
+    executor_context,
+    callback,
+    subscription_handle);
+  return RMW_RET_OK;
+}
 }  // namespace rmw_fastrtps_shared_cpp

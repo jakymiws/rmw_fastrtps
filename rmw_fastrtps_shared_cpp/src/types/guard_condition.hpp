@@ -22,7 +22,7 @@
 #include <mutex>
 #include <utility>
 
-#include "rcutils/event_types.h"
+#include "rcutils/executor_event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
 
 class GuardCondition
@@ -36,7 +36,7 @@ public:
   trigger()
   {
     if(use_callback_) {
-      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
+      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, WAITABLE_EVENT });
     }
     else {
       std::lock_guard<std::mutex> lock(internalMutex_);
@@ -90,7 +90,7 @@ public:
   void
   setCallback(
     const void * executor_context,
-    Event_callback callback,
+    ExecutorEventCallback callback,
     const void * guard_condition_handle,
     bool use_previous_events)
   {
@@ -108,7 +108,7 @@ public:
     if (use_previous_events) {
       // Push events arrived before setting the event_handle_
       for(uint64_t i = 0; i < unread_count_; i++) {
-        event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, GUARD_CONDITION_EVENT });
+        event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, WAITABLE_EVENT });
       }
     }
 
@@ -122,7 +122,7 @@ private:
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  EventHandle event_handle_{nullptr, nullptr, nullptr};
+  ExecutorEventHandle event_handle_{nullptr, nullptr, nullptr};
   std::atomic_bool use_callback_{false};
   uint64_t unread_count_ = 0;
 };

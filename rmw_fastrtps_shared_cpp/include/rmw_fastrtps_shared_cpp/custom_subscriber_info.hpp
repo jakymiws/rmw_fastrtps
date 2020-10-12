@@ -24,7 +24,7 @@
 #include "fastrtps/subscriber/Subscriber.h"
 #include "fastrtps/subscriber/SubscriberListener.h"
 
-#include "rcutils/event_types.h"
+#include "rcutils/executor_event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
 
 #include "rmw/impl/cpp/macros.hpp"
@@ -164,7 +164,7 @@ public:
   void
   setCallback(
     const void * executor_context,
-    Event_callback callback,
+    ExecutorEventCallback callback,
     const void * subscription_handle)
   {
     if(executor_context && subscription_handle && callback)
@@ -206,7 +206,7 @@ private:
 
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  EventHandle event_handle_{nullptr, nullptr, nullptr};
+  ExecutorEventHandle event_handle_{nullptr, nullptr, nullptr};
   std::atomic_bool use_callback_{false};
   uint64_t unread_count_ = 0;
 };

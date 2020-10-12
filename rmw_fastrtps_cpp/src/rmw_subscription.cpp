@@ -169,13 +169,13 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
 }
 
 rmw_ret_t
-rmw_set_subscription_callback(
+rmw_subscription_set_events_executor_callback(
   const void * executor_context,
-  Event_callback callback,
+  ExecutorEventCallback callback,
   const void * subscription_handle,
   void * rmw_subscription)
 {
-  return rmw_fastrtps_shared_cpp::__rmw_set_subscription_callback(
+  return rmw_fastrtps_shared_cpp::__rmw_subscription_set_events_executor_callback(
     executor_context,
     callback,
     subscription_handle,

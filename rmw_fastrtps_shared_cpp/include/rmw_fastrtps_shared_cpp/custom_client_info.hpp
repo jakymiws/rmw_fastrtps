@@ -32,7 +32,7 @@
 #include "fastrtps/publisher/Publisher.h"
 #include "fastrtps/publisher/PublisherListener.h"
 
-#include "rcutils/event_types.h"
+#include "rcutils/executor_event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
@@ -177,7 +177,7 @@ public:
   void
   setCallback(
     const void * executor_context,
-    Event_callback callback,
+    ExecutorEventCallback callback,
     const void * client_handle)
   {
     if(executor_context && client_handle && callback)
@@ -220,7 +220,7 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_;
 
-  EventHandle event_handle_{nullptr, nullptr, nullptr};
+  ExecutorEventHandle event_handle_{nullptr, nullptr, nullptr};
   std::atomic_bool use_callback_{false};
   uint64_t unread_count_ = 0;
 };

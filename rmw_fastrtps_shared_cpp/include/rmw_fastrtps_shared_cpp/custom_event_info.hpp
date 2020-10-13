@@ -33,6 +33,8 @@
 
 #include "rmw/event.h"
 
+#include "rcutils/executor_event_types.h"
+
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
 
 
@@ -65,6 +67,20 @@ public:
     * \return `false` if data was not available, in this case nothing was written to event_info.
     */
   virtual bool takeNextEvent(rmw_event_type_t event_type, void * event_info) = 0;
+
+  // Provide handlers to perform an action when a
+  // new event from this listener has ocurred
+  virtual void eventSetExecutorCallback(
+    const void * executor_context,
+    ExecutorEventCallback callback,
+    const void * event_handle,
+    bool use_previous_events) = 0;
+
+  ExecutorEventCallback executor_callback_{nullptr};
+  ExecutorEvent qos_change_event_{nullptr, WAITABLE_EVENT};
+  std::atomic_bool use_executor_callback_{false};
+  const void * executor_context_{nullptr};
+  uint64_t unread_events_count_ = 0;
 };
 
 class EventListenerInterface::ConditionalScopedLock

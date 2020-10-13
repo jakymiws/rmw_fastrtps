@@ -38,6 +38,13 @@ PubListener::on_offered_deadline_missed(
   offered_deadline_missed_status_.total_count_change += status.total_count_change;
 
   deadline_changes_.store(true, std::memory_order_relaxed);
+
+  // Callback: add the change in qos event to the event queue
+  if(use_executor_callback_) {
+    executor_callback_(executor_context_, qos_change_event_);
+  } else {
+    unread_events_count_++;
+  }
 }
 
 void PubListener::on_liveliness_lost(
@@ -56,6 +63,13 @@ void PubListener::on_liveliness_lost(
   liveliness_lost_status_.total_count_change += status.total_count_change;
 
   liveliness_changes_.store(true, std::memory_order_relaxed);
+
+  // Callback: add the change in qos event to the event queue
+  if(use_executor_callback_) {
+    executor_callback_(executor_context_, qos_change_event_);
+  } else {
+    unread_events_count_++;
+  }
 }
 
 bool PubListener::hasEvent(rmw_event_type_t event_type) const
@@ -70,6 +84,36 @@ bool PubListener::hasEvent(rmw_event_type_t event_type) const
       break;
   }
   return false;
+}
+
+void PubListener::eventSetExecutorCallback(
+    const void * executor_context,
+    ExecutorEventCallback callback,
+    const void * event_handle,
+    bool use_previous_events)
+{
+  if(executor_context && event_handle && callback)
+  {
+    executor_context_ = executor_context;
+    executor_callback_ = callback;
+    qos_change_event_ = { event_handle, WAITABLE_EVENT };
+    use_executor_callback_ = true;
+  }
+  else {
+     // Unset callback: If any of the pointers is NULL, do not use callback.
+    use_executor_callback_ = false;
+    return;
+  }
+
+  if (use_previous_events) {
+    // Push events arrived before setting the qos_event_handle_
+    for(uint64_t i = 0; i < unread_events_count_; i++) {
+      executor_callback_(executor_context_, qos_change_event_);
+    }
+  }
+
+  // Reset unread count
+  unread_events_count_ = 0;
 }
 
 bool PubListener::takeNextEvent(rmw_event_type_t event_type, void * event_info)

@@ -425,6 +425,15 @@ __rmw_guard_condition_set_events_executor_callback(
   void * rmw_guard_condition,
   bool use_previous_events);
 
+RMW_FASTRTPS_SHARED_CPP_PUBLIC
+rmw_ret_t
+__rmw_event_set_events_executor_callback(
+  const void * executor_context,
+  ExecutorEventCallback callback,
+  const void * event_handle,
+  void * rmw_event,
+  bool use_previous_events);
+
 }  // namespace rmw_fastrtps_shared_cpp
 
 #endif  // RMW_FASTRTPS_SHARED_CPP__RMW_COMMON_HPP_

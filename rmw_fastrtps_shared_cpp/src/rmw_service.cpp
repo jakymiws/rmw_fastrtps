@@ -102,7 +102,7 @@ __rmw_service_set_events_executor_callback(
   void * rmw_service)
 {
   auto custom_service_info = static_cast<CustomServiceInfo *>(rmw_service);
-  custom_service_info->listener_->setCallback(
+  custom_service_info->listener_->serviceSetExecutorCallback(
     executor_context,
     callback,
     service_handle);

@@ -85,11 +85,11 @@ public:
   onNewDataMessage(eprosima::fastrtps::Subscriber * sub) final
   {
     // Callback: add the subscription event to the event queue
-    if(use_callback_) {
-      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SUBSCRIPTION_EVENT });
+    if(use_executor_callback_) {
+      executor_callback_(executor_context_, subscription_event_);
     } else {
       update_unread_count(sub);
-      unread_count_++;
+      new_data_unread_count_++;
     }
   }
 
@@ -109,6 +109,13 @@ public:
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
   bool
   hasEvent(rmw_event_type_t event_type) const final;
+
+  RMW_FASTRTPS_SHARED_CPP_PUBLIC
+  void eventSetExecutorCallback(
+    const void * executor_context,
+    ExecutorEventCallback callback,
+    const void * event_handle,
+    bool use_previous_events) final;
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
   bool
@@ -162,30 +169,32 @@ public:
   // Provide handlers to perform an action when a
   // new event from this listener has ocurred
   void
-  setCallback(
+  subcriptionSetExecutorCallback(
     const void * executor_context,
     ExecutorEventCallback callback,
     const void * subscription_handle)
   {
     if(executor_context && subscription_handle && callback)
     {
-      event_handle_ = {executor_context, subscription_handle, callback};
-      use_callback_ = true;
+      executor_context_ = executor_context;
+      executor_callback_ = callback;
+      subscription_event_ = { subscription_handle, SUBSCRIPTION_EVENT };
+      use_executor_callback_ = true;
     }
     else
     {
-       // Unset callback: If any of the pointers is NULL, do not use callback.
-      use_callback_ = false;
+      // Unset callback: If any of the pointers is NULL, do not use callback.
+      use_executor_callback_ = false;
       return;
     }
 
-    // Push events arrived before setting the event_handle_
-    for(uint64_t i = 0; i < unread_count_; i++) {
-      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, SUBSCRIPTION_EVENT });
+    // Push events arrived before setting the executor callback
+    for(uint64_t i = 0; i < new_data_unread_count_; i++) {
+      executor_callback_(executor_context_, subscription_event_);
     }
 
     // Reset unread count
-    unread_count_ = 0;
+    new_data_unread_count_ = 0;
   }
 
 private:
@@ -206,9 +215,8 @@ private:
 
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  ExecutorEventHandle event_handle_{nullptr, nullptr, nullptr};
-  std::atomic_bool use_callback_{false};
-  uint64_t unread_count_ = 0;
+  ExecutorEvent subscription_event_{nullptr, SUBSCRIPTION_EVENT};
+  uint64_t new_data_unread_count_ = 0;
 };
 
 #endif  // RMW_FASTRTPS_SHARED_CPP__CUSTOM_SUBSCRIBER_INFO_HPP_

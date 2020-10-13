@@ -110,8 +110,8 @@ public:
           }
 
           // Add the client event to the event queue
-          if(use_callback_) {
-            event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, CLIENT_EVENT });
+          if(use_executor_callback_) {
+            executor_callback_(executor_context_, client_event_);
           } else {
             unread_count_++;
           }
@@ -175,25 +175,27 @@ public:
   // Provide handlers to perform an action when a
   // new event from this listener has ocurred
   void
-  setCallback(
+  clientSetExecutorCallback(
     const void * executor_context,
     ExecutorEventCallback callback,
     const void * client_handle)
   {
     if(executor_context && client_handle && callback)
     {
-      event_handle_ = {executor_context, client_handle, callback};
-      use_callback_ = true;
+      executor_context_ = executor_context;
+      executor_callback_ = callback;
+      client_event_ = { client_handle, CLIENT_EVENT};
+      use_executor_callback_ = true;
     }
     else {
        // Unset callback: If any of the pointers is NULL, do not use callback.
-      use_callback_ = false;
+      use_executor_callback_ = false;
       return;
     }
 
-    // Push events arrived before setting the event_handle_
+    // Push events arrived before setting the the executor callback
     for(uint64_t i = 0; i < unread_count_; i++) {
-      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, CLIENT_EVENT });
+      executor_callback_(executor_context_, client_event_);
     }
 
     // Reset unread count
@@ -220,8 +222,10 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_;
 
-  ExecutorEventHandle event_handle_{nullptr, nullptr, nullptr};
-  std::atomic_bool use_callback_{false};
+  ExecutorEventCallback executor_callback_{nullptr};
+  ExecutorEvent client_event_{nullptr, CLIENT_EVENT};
+  std::atomic_bool use_executor_callback_{false};
+  const void * executor_context_{nullptr};
   uint64_t unread_count_ = 0;
 };
 

@@ -35,8 +35,8 @@ public:
   void
   trigger()
   {
-    if(use_callback_) {
-      event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, WAITABLE_EVENT });
+    if(use_executor_callback_) {
+      executor_callback_(executor_context_, waitable_event_);
     }
     else {
       std::lock_guard<std::mutex> lock(internalMutex_);
@@ -88,27 +88,29 @@ public:
   // Provide handlers to perform an action when a
   // new event from this listener has ocurred
   void
-  setCallback(
+  guardConditionSetExecutorCallback(
     const void * executor_context,
     ExecutorEventCallback callback,
-    const void * guard_condition_handle,
+    const void * waitable_handle,
     bool use_previous_events)
   {
-    if(executor_context && guard_condition_handle && callback)
+    if(executor_context && waitable_handle && callback)
     {
-      event_handle_ = {executor_context, guard_condition_handle, callback};
-      use_callback_ = true;
+      executor_context_ = executor_context;
+      executor_callback_ = callback;
+      waitable_event_ = { waitable_handle, WAITABLE_EVENT};
+      use_executor_callback_ = true;
     }
     else {
        // Unset callback: If any of the pointers is NULL, do not use callback.
-      use_callback_ = false;
+      use_executor_callback_ = false;
       return;
     }
 
     if (use_previous_events) {
       // Push events arrived before setting the event_handle_
       for(uint64_t i = 0; i < unread_count_; i++) {
-        event_handle_.callback(event_handle_.context, { event_handle_.ros2_handle, WAITABLE_EVENT });
+        executor_callback_(executor_context_, waitable_event_);
       }
     }
 
@@ -122,8 +124,10 @@ private:
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  ExecutorEventHandle event_handle_{nullptr, nullptr, nullptr};
-  std::atomic_bool use_callback_{false};
+  ExecutorEventCallback executor_callback_{nullptr};
+  ExecutorEvent waitable_event_{nullptr, WAITABLE_EVENT};
+  std::atomic_bool use_executor_callback_{false};
+  const void * executor_context_{nullptr};
   uint64_t unread_count_ = 0;
 };
 

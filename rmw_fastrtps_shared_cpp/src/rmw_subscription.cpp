@@ -115,7 +115,7 @@ __rmw_subscription_set_events_executor_callback(
   void * rmw_subscription)
 {
   auto custom_subscriber_info = static_cast<CustomSubscriberInfo *>(rmw_subscription);
-  custom_subscriber_info->listener_->setCallback(
+  custom_subscriber_info->listener_->subcriptionSetExecutorCallback(
     executor_context,
     callback,
     subscription_handle);

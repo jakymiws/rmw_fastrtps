@@ -56,7 +56,7 @@ __rmw_guard_condition_set_events_executor_callback(
   bool use_previous_events)
 {
   auto guard_condition = static_cast<GuardCondition *>(rmw_guard_condition);
-  guard_condition->setCallback(
+  guard_condition->guardConditionSetExecutorCallback(
     executor_context,
     callback,
     guard_condition_handle,

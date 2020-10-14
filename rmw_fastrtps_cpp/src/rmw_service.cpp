@@ -339,14 +339,14 @@ rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
     eprosima_fastrtps_identifier, node, service);
 }
 
-void
+rmw_ret_t
 rmw_service_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
   const void * service_handle,
   void * rmw_service)
 {
-  rmw_fastrtps_shared_cpp::__rmw_service_set_events_executor_callback(
+  return rmw_fastrtps_shared_cpp::__rmw_service_set_events_executor_callback(
     executor_context,
     callback,
     service_handle,

@@ -81,7 +81,7 @@ __rmw_destroy_client(
   return ret;
 }
 
-void
+rmw_ret_t
 __rmw_client_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
@@ -93,5 +93,6 @@ __rmw_client_set_events_executor_callback(
     executor_context,
     callback,
     client_handle);
+  return RMW_RET_OK;
 }
 }  // namespace rmw_fastrtps_shared_cpp

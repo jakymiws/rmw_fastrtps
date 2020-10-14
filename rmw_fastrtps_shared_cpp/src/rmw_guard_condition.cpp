@@ -47,7 +47,7 @@ __rmw_destroy_guard_condition(rmw_guard_condition_t * guard_condition)
   return ret;
 }
 
-void
+rmw_ret_t
 __rmw_guard_condition_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
@@ -61,5 +61,6 @@ __rmw_guard_condition_set_events_executor_callback(
     callback,
     guard_condition_handle,
     use_previous_events);
+  return RMW_RET_OK;
 }
 }  // namespace rmw_fastrtps_shared_cpp

@@ -68,7 +68,7 @@ __rmw_init_event(
   return RMW_RET_OK;
 }
 
-rmw_ret_t
+void
 __rmw_event_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
@@ -83,7 +83,6 @@ __rmw_event_set_events_executor_callback(
     callback,
     event_handle,
     use_previous_events);
-  return RMW_RET_OK;
 }
 
 }  // namespace rmw_fastrtps_shared_cpp

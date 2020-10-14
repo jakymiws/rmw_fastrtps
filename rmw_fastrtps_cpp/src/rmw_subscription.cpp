@@ -168,14 +168,14 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
     eprosima_fastrtps_identifier, node, subscription);
 }
 
-rmw_ret_t
+void
 rmw_subscription_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
   const void * subscription_handle,
   void * rmw_subscription)
 {
-  return rmw_fastrtps_shared_cpp::__rmw_subscription_set_events_executor_callback(
+  rmw_fastrtps_shared_cpp::__rmw_subscription_set_events_executor_callback(
     executor_context,
     callback,
     subscription_handle,

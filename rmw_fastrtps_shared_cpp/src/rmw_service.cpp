@@ -94,7 +94,7 @@ __rmw_destroy_service(
   return ret;
 }
 
-void
+rmw_ret_t
 __rmw_service_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
@@ -106,5 +106,6 @@ __rmw_service_set_events_executor_callback(
     executor_context,
     callback,
     service_handle);
+  return RMW_RET_OK;
 }
 }  // namespace rmw_fastrtps_shared_cpp

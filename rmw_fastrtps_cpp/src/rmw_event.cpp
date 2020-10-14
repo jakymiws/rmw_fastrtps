@@ -48,7 +48,7 @@ rmw_subscription_event_init(
     event_type);
 }
 
-void
+rmw_ret_t
 rmw_event_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
@@ -56,7 +56,7 @@ rmw_event_set_events_executor_callback(
   void * rmw_event,
   bool use_previous_events)
 {
-  rmw_fastrtps_shared_cpp::__rmw_event_set_events_executor_callback(
+  return rmw_fastrtps_shared_cpp::__rmw_event_set_events_executor_callback(
     executor_context,
     callback,
     event_handle,

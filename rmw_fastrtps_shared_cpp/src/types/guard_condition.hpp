@@ -106,7 +106,10 @@ public:
       use_executor_callback_ = true;
     }
     else {
-       // Unset callback: If any of the pointers is NULL, do not use callback.
+      // Unset callback: If any of the pointers is NULL, do not use callback.
+      executor_context_ = nullptr;
+      executor_callback_ = nullptr;
+      waitable_handle_ = nullptr;
       use_executor_callback_ = false;
       return;
     }

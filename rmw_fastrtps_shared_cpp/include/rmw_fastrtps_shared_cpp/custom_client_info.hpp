@@ -110,8 +110,10 @@ public:
           }
 
           // Add the client event to the event queue
+          std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
           if(use_executor_callback_) {
-            executor_callback_(executor_context_, client_event_);
+            executor_callback_(executor_context_, { client_handle_, CLIENT_EVENT });
           } else {
             unread_count_++;
           }
@@ -180,22 +182,27 @@ public:
     ExecutorEventCallback callback,
     const void * client_handle)
   {
+    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
     if(executor_context && client_handle && callback)
     {
       executor_context_ = executor_context;
       executor_callback_ = callback;
-      client_event_ = { client_handle, CLIENT_EVENT};
+      client_handle_ = client_handle;
       use_executor_callback_ = true;
     }
     else {
        // Unset callback: If any of the pointers is NULL, do not use callback.
+      executor_context_ = nullptr;
+      executor_callback_ = nullptr;
+      client_handle_ = nullptr;
       use_executor_callback_ = false;
       return;
     }
 
     // Push events arrived before setting the the executor callback
     for(uint64_t i = 0; i < unread_count_; i++) {
-      executor_callback_(executor_context_, client_event_);
+      executor_callback_(executor_context_, { client_handle_, CLIENT_EVENT });
     }
 
     // Reset unread count
@@ -223,9 +230,10 @@ private:
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_;
 
   ExecutorEventCallback executor_callback_{nullptr};
-  ExecutorEvent client_event_{nullptr, CLIENT_EVENT};
-  std::atomic_bool use_executor_callback_{false};
+  bool use_executor_callback_{false};
+  const void * client_handle_{nullptr};
   const void * executor_context_{nullptr};
+  std::mutex executor_callback_mutex_;
   uint64_t unread_count_ = 0;
 };
 

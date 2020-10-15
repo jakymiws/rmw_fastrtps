@@ -40,8 +40,10 @@ PubListener::on_offered_deadline_missed(
   deadline_changes_.store(true, std::memory_order_relaxed);
 
   // Callback: add the change in qos event to the event queue
+  std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
   if(use_executor_callback_) {
-    executor_callback_(executor_context_, qos_change_event_);
+    executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
   } else {
     unread_events_count_++;
   }
@@ -65,8 +67,10 @@ void PubListener::on_liveliness_lost(
   liveliness_changes_.store(true, std::memory_order_relaxed);
 
   // Callback: add the change in qos event to the event queue
+  std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
   if(use_executor_callback_) {
-    executor_callback_(executor_context_, qos_change_event_);
+    executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
   } else {
     unread_events_count_++;
   }
@@ -89,26 +93,31 @@ bool PubListener::hasEvent(rmw_event_type_t event_type) const
 void PubListener::eventSetExecutorCallback(
     const void * executor_context,
     ExecutorEventCallback callback,
-    const void * event_handle,
+    const void * waitable_handle,
     bool use_previous_events)
 {
-  if(executor_context && event_handle && callback)
+  std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
+  if(executor_context && waitable_handle && callback)
   {
     executor_context_ = executor_context;
     executor_callback_ = callback;
-    qos_change_event_ = { event_handle, WAITABLE_EVENT };
+    waitable_handle_ = waitable_handle;
     use_executor_callback_ = true;
   }
   else {
-     // Unset callback: If any of the pointers is NULL, do not use callback.
+    // Unset callback: If any of the pointers is NULL, do not use callback.
+    executor_context_ = nullptr;
+    executor_callback_ = nullptr;
+    waitable_handle_ = nullptr;
     use_executor_callback_ = false;
     return;
   }
 
   if (use_previous_events) {
-    // Push events arrived before setting the qos_event_handle_
+    // Push events arrived before setting the executor's callback
     for(uint64_t i = 0; i < unread_events_count_; i++) {
-      executor_callback_(executor_context_, qos_change_event_);
+      executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
     }
   }
 

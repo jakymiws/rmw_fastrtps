@@ -85,8 +85,10 @@ public:
   onNewDataMessage(eprosima::fastrtps::Subscriber * sub) final
   {
     // Callback: add the subscription event to the event queue
+    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
     if(use_executor_callback_) {
-      executor_callback_(executor_context_, subscription_event_);
+      executor_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
     } else {
       update_unread_count(sub);
       new_data_unread_count_++;
@@ -114,7 +116,7 @@ public:
   void eventSetExecutorCallback(
     const void * executor_context,
     ExecutorEventCallback callback,
-    const void * event_handle,
+    const void * waitable_handle,
     bool use_previous_events) final;
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
@@ -174,23 +176,28 @@ public:
     ExecutorEventCallback callback,
     const void * subscription_handle)
   {
+    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
     if(executor_context && subscription_handle && callback)
     {
       executor_context_ = executor_context;
       executor_callback_ = callback;
-      subscription_event_ = { subscription_handle, SUBSCRIPTION_EVENT };
+      subscription_handle_ = subscription_handle;
       use_executor_callback_ = true;
     }
     else
     {
       // Unset callback: If any of the pointers is NULL, do not use callback.
+      executor_context_ = nullptr;
+      executor_callback_ = nullptr;
+      subscription_handle_ = nullptr;
       use_executor_callback_ = false;
       return;
     }
 
-    // Push events arrived before setting the executor callback
+    // Push events arrived before setting the executor's callback
     for(uint64_t i = 0; i < new_data_unread_count_; i++) {
-      executor_callback_(executor_context_, subscription_event_);
+      executor_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
     }
 
     // Reset unread count
@@ -216,6 +223,7 @@ private:
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
   ExecutorEvent subscription_event_{nullptr, SUBSCRIPTION_EVENT};
+  const void * subscription_handle_;
   uint64_t new_data_unread_count_ = 0;
 };
 

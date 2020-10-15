@@ -35,8 +35,10 @@ public:
   void
   trigger()
   {
+    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
     if(use_executor_callback_) {
-      executor_callback_(executor_context_, waitable_event_);
+      executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
     }
     else {
       std::lock_guard<std::mutex> lock(internalMutex_);
@@ -94,11 +96,13 @@ public:
     const void * waitable_handle,
     bool use_previous_events)
   {
+    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
     if(executor_context && waitable_handle && callback)
     {
       executor_context_ = executor_context;
       executor_callback_ = callback;
-      waitable_event_ = { waitable_handle, WAITABLE_EVENT};
+      waitable_handle_ = waitable_handle;
       use_executor_callback_ = true;
     }
     else {
@@ -108,9 +112,9 @@ public:
     }
 
     if (use_previous_events) {
-      // Push events arrived before setting the event_handle_
+      // Push events arrived before setting the executor's callback
       for(uint64_t i = 0; i < unread_count_; i++) {
-        executor_callback_(executor_context_, waitable_event_);
+        executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
       }
     }
 
@@ -125,9 +129,10 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
   ExecutorEventCallback executor_callback_{nullptr};
-  ExecutorEvent waitable_event_{nullptr, WAITABLE_EVENT};
-  std::atomic_bool use_executor_callback_{false};
+  const void * waitable_handle_{nullptr};
+  bool use_executor_callback_{false};
   const void * executor_context_{nullptr};
+  std::mutex executor_callback_mutex_;
   uint64_t unread_count_ = 0;
 };
 

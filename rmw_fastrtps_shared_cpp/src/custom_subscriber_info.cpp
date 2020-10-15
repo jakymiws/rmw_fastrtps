@@ -40,8 +40,10 @@ SubListener::on_requested_deadline_missed(
   deadline_changes_.store(true, std::memory_order_relaxed);
 
   // Callback: add the subscription event to the event queue
+  std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
   if(use_executor_callback_) {
-    executor_callback_(executor_context_, qos_change_event_);
+    executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
   } else {
     unread_events_count_++;
   }
@@ -67,8 +69,10 @@ void SubListener::on_liveliness_changed(
   liveliness_changes_.store(true, std::memory_order_relaxed);
 
   // Callback: add the subscription event to the event queue
+  std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
   if(use_executor_callback_) {
-    executor_callback_(executor_context_, qos_change_event_);
+    executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
   } else {
     unread_events_count_++;
   }
@@ -91,14 +95,16 @@ bool SubListener::hasEvent(rmw_event_type_t event_type) const
 void SubListener::eventSetExecutorCallback(
     const void * executor_context,
     ExecutorEventCallback callback,
-    const void * event_handle,
+    const void * waitable_handle,
     bool use_previous_events)
 {
-  if(executor_context && event_handle && callback)
+  std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+
+  if(executor_context && waitable_handle && callback)
   {
     executor_context_ = executor_context;
     executor_callback_ = callback;
-    qos_change_event_ = { event_handle, WAITABLE_EVENT };
+    waitable_handle_ = waitable_handle;
     use_executor_callback_ = true;
   }
   else {
@@ -109,9 +115,9 @@ void SubListener::eventSetExecutorCallback(
 
 
   if (use_previous_events) {
-    // Push events arrived before setting the qos_event_handle_
+    // Push events arrived before setting the executor's callback
     for(uint64_t i = 0; i < unread_events_count_; i++) {
-      executor_callback_(executor_context_, qos_change_event_);
+      executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
     }
   }
 

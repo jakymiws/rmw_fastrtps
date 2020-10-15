@@ -73,14 +73,15 @@ public:
   virtual void eventSetExecutorCallback(
     const void * executor_context,
     ExecutorEventCallback callback,
-    const void * event_handle,
+    const void * waitable_handle,
     bool use_previous_events) = 0;
 
   ExecutorEventCallback executor_callback_{nullptr};
-  ExecutorEvent qos_change_event_{nullptr, WAITABLE_EVENT};
-  std::atomic_bool use_executor_callback_{false};
+  bool use_executor_callback_{false};
   const void * executor_context_{nullptr};
+  const void * waitable_handle_{nullptr};
   uint64_t unread_events_count_ = 0;
+  std::mutex executor_callback_mutex_;
 };
 
 class EventListenerInterface::ConditionalScopedLock

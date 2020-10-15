@@ -72,7 +72,7 @@ rmw_ret_t
 __rmw_event_set_events_executor_callback(
   const void * executor_context,
   ExecutorEventCallback callback,
-  const void * event_handle,
+  const void * waitable_handle,
   void * rmw_event,
   bool use_previous_events)
 {
@@ -81,7 +81,7 @@ __rmw_event_set_events_executor_callback(
   custom_event_info->getListener()->eventSetExecutorCallback(
     executor_context,
     callback,
-    event_handle,
+    waitable_handle,
     use_previous_events);
   return RMW_RET_OK;
 }

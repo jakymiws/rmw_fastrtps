@@ -87,7 +87,7 @@ public:
     // Callback: add the subscription event to the event queue
     std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
 
-    if(use_executor_callback_) {
+    if(executor_callback_) {
       executor_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
     } else {
       update_unread_count(sub);
@@ -183,15 +183,11 @@ public:
       executor_context_ = executor_context;
       executor_callback_ = callback;
       subscription_handle_ = subscription_handle;
-      use_executor_callback_ = true;
-    }
-    else
-    {
+    } else {
       // Unset callback: If any of the pointers is NULL, do not use callback.
       executor_context_ = nullptr;
       executor_callback_ = nullptr;
       subscription_handle_ = nullptr;
-      use_executor_callback_ = false;
       return;
     }
 

@@ -342,7 +342,7 @@ rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
 rmw_ret_t
 rmw_service_set_events_executor_callback(
   const void * executor_context,
-  ExecutorEventCallback callback,
+  EventsExecutorCallback callback,
   const void * service_handle,
   void * rmw_service)
 {

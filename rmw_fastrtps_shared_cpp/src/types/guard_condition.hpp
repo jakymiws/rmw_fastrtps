@@ -92,7 +92,7 @@ public:
   void
   guardConditionSetExecutorCallback(
     const void * executor_context,
-    ExecutorEventCallback callback,
+    EventsExecutorCallback callback,
     const void * waitable_handle,
     bool use_previous_events)
   {
@@ -128,7 +128,7 @@ private:
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  ExecutorEventCallback executor_callback_{nullptr};
+  EventsExecutorCallback executor_callback_{nullptr};
   const void * waitable_handle_{nullptr};
   const void * executor_context_{nullptr};
   std::mutex executor_callback_mutex_;

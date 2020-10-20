@@ -175,7 +175,7 @@ public:
   void
   serviceSetExecutorCallback(
     const void * executor_context,
-    ExecutorEventCallback callback,
+    EventsExecutorCallback callback,
     const void * service_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
@@ -210,7 +210,7 @@ private:
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  ExecutorEventCallback executor_callback_{nullptr};
+  EventsExecutorCallback executor_callback_{nullptr};
   const void * service_handle_{nullptr};
   const void * executor_context_{nullptr};
   std::mutex executor_callback_mutex_;

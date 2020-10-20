@@ -51,7 +51,7 @@ rmw_subscription_event_init(
 rmw_ret_t
 rmw_event_set_events_executor_callback(
   const void * executor_context,
-  ExecutorEventCallback callback,
+  EventsExecutorCallback callback,
   const void * waitable_handle,
   void * rmw_event,
   bool use_previous_events)

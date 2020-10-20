@@ -92,7 +92,7 @@ bool PubListener::hasEvent(rmw_event_type_t event_type) const
 
 void PubListener::eventSetExecutorCallback(
     const void * executor_context,
-    ExecutorEventCallback callback,
+    EventsExecutorCallback callback,
     const void * waitable_handle,
     bool use_previous_events)
 {

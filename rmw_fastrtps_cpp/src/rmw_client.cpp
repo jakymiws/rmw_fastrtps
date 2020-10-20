@@ -336,7 +336,7 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
 rmw_ret_t
 rmw_client_set_events_executor_callback(
   const void * executor_context,
-  ExecutorEventCallback callback,
+  EventsExecutorCallback callback,
   const void * client_handle,
   void * rmw_client)
 {

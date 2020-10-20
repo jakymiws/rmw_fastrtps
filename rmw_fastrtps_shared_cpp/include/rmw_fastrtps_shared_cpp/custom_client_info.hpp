@@ -179,7 +179,7 @@ public:
   void
   clientSetExecutorCallback(
     const void * executor_context,
-    ExecutorEventCallback callback,
+    EventsExecutorCallback callback,
     const void * client_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
@@ -226,7 +226,7 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_;
 
-  ExecutorEventCallback executor_callback_{nullptr};
+  EventsExecutorCallback executor_callback_{nullptr};
   const void * client_handle_{nullptr};
   const void * executor_context_{nullptr};
   std::mutex executor_callback_mutex_;

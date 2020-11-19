@@ -340,13 +340,13 @@ rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
 }
 
 rmw_ret_t
-rmw_service_set_events_executor_callback(
+rmw_service_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * service_handle,
   void * rmw_service)
 {
-  return rmw_fastrtps_shared_cpp::__rmw_service_set_events_executor_callback(
+  return rmw_fastrtps_shared_cpp::__rmw_service_set_listener_callback(
     executor_context,
     callback,
     service_handle,

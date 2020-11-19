@@ -82,7 +82,7 @@ __rmw_destroy_client(
 }
 
 rmw_ret_t
-__rmw_client_set_events_executor_callback(
+__rmw_client_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * client_handle,

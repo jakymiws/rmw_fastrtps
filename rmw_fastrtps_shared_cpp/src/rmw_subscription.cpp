@@ -108,7 +108,7 @@ __rmw_subscription_get_actual_qos(
 }
 
 rmw_ret_t
-__rmw_subscription_set_events_executor_callback(
+__rmw_subscription_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * subscription_handle,

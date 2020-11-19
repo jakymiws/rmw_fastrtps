@@ -394,7 +394,7 @@ __rmw_get_subscriptions_info_by_topic(
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
-__rmw_subscription_set_events_executor_callback(
+__rmw_subscription_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * subscription_handle,
@@ -402,7 +402,7 @@ __rmw_subscription_set_events_executor_callback(
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
-__rmw_service_set_events_executor_callback(
+__rmw_service_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * service_handle,
@@ -410,7 +410,7 @@ __rmw_service_set_events_executor_callback(
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
-__rmw_client_set_events_executor_callback(
+__rmw_client_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * client_handle,
@@ -418,7 +418,7 @@ __rmw_client_set_events_executor_callback(
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
-__rmw_guard_condition_set_events_executor_callback(
+__rmw_guard_condition_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * guard_condition_handle,
@@ -427,7 +427,7 @@ __rmw_guard_condition_set_events_executor_callback(
 
 RMW_FASTRTPS_SHARED_CPP_PUBLIC
 rmw_ret_t
-__rmw_event_set_events_executor_callback(
+__rmw_event_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * waitable_handle,

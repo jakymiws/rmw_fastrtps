@@ -69,7 +69,7 @@ __rmw_init_event(
 }
 
 rmw_ret_t
-__rmw_event_set_events_executor_callback(
+__rmw_event_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * waitable_handle,

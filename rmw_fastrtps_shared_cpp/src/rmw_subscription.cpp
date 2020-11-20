@@ -108,15 +108,15 @@ __rmw_subscription_get_actual_qos(
 }
 
 rmw_ret_t
-__rmw_subscription_set_events_executor_callback(
-  const void * executor_context,
-  EventsExecutorCallback callback,
+__rmw_subscription_set_listener_callback(
+  const void * callback_context,
+  rmw_listener_cb_t callback,
   const void * subscription_handle,
   rmw_subscription_t * rmw_subscription)
 {
   auto custom_subscriber_info = static_cast<CustomSubscriberInfo *>(rmw_subscription->data);
   custom_subscriber_info->listener_->subcriptionSetExecutorCallback(
-    executor_context,
+    callback_context,
     callback,
     subscription_handle);
   return RMW_RET_OK;

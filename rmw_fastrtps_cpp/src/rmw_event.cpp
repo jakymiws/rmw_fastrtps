@@ -53,7 +53,7 @@ rmw_event_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * waitable_handle,
-  void * rmw_event,
+  rmw_event_t * rmw_event,
   bool use_previous_events)
 {
   return rmw_fastrtps_shared_cpp::__rmw_event_set_listener_callback(

@@ -338,7 +338,7 @@ rmw_client_set_listener_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * client_handle,
-  void * rmw_client)
+  rmw_client_t * rmw_client)
 {
   return rmw_fastrtps_shared_cpp::__rmw_client_set_listener_callback(
     executor_context,

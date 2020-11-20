@@ -73,11 +73,10 @@ __rmw_event_set_events_executor_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * waitable_handle,
-  void * rmw_event,
+  rmw_event_t * rmw_event,
   bool use_previous_events)
 {
-  auto event = static_cast<rmw_event_t *>(rmw_event);
-  auto custom_event_info = static_cast<CustomEventInfo *>(event->data);
+  auto custom_event_info = static_cast<CustomEventInfo *>(rmw_event->data);
   custom_event_info->getListener()->eventSetExecutorCallback(
     executor_context,
     callback,

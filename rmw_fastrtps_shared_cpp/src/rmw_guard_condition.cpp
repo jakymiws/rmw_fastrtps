@@ -52,10 +52,10 @@ __rmw_guard_condition_set_events_executor_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * guard_condition_handle,
-  void * rmw_guard_condition,
+  rmw_guard_condition_t * rmw_guard_condition,
   bool use_previous_events)
 {
-  auto guard_condition = static_cast<GuardCondition *>(rmw_guard_condition);
+  auto guard_condition = static_cast<GuardCondition *>(rmw_guard_condition->data);
   guard_condition->guardConditionSetExecutorCallback(
     executor_context,
     callback,

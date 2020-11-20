@@ -88,7 +88,7 @@ public:
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
     if(listener_callback_) {
-      listener_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
+      listener_callback_(callback_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
     } else {
       update_unread_count(sub);
       new_data_unread_count_++;
@@ -114,7 +114,7 @@ public:
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
   void eventSetExecutorCallback(
-    const void * executor_context,
+    const void * callback_context,
     rmw_listener_cb_t callback,
     const void * waitable_handle,
     bool use_previous_events) final;
@@ -172,20 +172,20 @@ public:
   // new event from this listener has ocurred
   void
   subcriptionSetExecutorCallback(
-    const void * executor_context,
+    const void * callback_context,
     rmw_listener_cb_t callback,
     const void * subscription_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-    if(executor_context && subscription_handle && callback)
+    if(callback_context && subscription_handle && callback)
     {
-      executor_context_ = executor_context;
+      callback_context_ = callback_context;
       listener_callback_ = callback;
       subscription_handle_ = subscription_handle;
     } else {
       // Unset callback: If any of the pointers is NULL, do not use callback.
-      executor_context_ = nullptr;
+      callback_context_ = nullptr;
       listener_callback_ = nullptr;
       subscription_handle_ = nullptr;
       return;
@@ -193,7 +193,7 @@ public:
 
     // Push events arrived before setting the executor's callback
     for(uint64_t i = 0; i < new_data_unread_count_; i++) {
-      listener_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
+      listener_callback_(callback_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
     }
 
     // Reset unread count

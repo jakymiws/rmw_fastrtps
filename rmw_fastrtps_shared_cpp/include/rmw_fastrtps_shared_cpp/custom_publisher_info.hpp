@@ -95,7 +95,7 @@ public:
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
   void eventSetExecutorCallback(
-    const void * executor_context,
+    const void * callback_context,
     rmw_listener_cb_t callback,
     const void * waitable_handle,
     bool use_previous_events) final;

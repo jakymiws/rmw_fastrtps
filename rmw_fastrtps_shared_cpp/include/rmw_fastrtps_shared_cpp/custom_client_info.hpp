@@ -114,7 +114,7 @@ public:
           std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
           if(listener_callback_) {
-            listener_callback_(executor_context_, { client_handle_, CLIENT_EVENT });
+            listener_callback_(callback_context_, { client_handle_, CLIENT_EVENT });
           } else {
             unread_count_++;
           }
@@ -179,20 +179,20 @@ public:
   // new event from this listener has ocurred
   void
   clientSetExecutorCallback(
-    const void * executor_context,
+    const void * callback_context,
     rmw_listener_cb_t callback,
     const void * client_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-    if(executor_context && client_handle && callback)
+    if(callback_context && client_handle && callback)
     {
-      executor_context_ = executor_context;
+      callback_context_ = callback_context;
       listener_callback_ = callback;
       client_handle_ = client_handle;
     } else {
        // Unset callback: If any of the pointers is NULL, do not use callback.
-      executor_context_ = nullptr;
+      callback_context_ = nullptr;
       listener_callback_ = nullptr;
       client_handle_ = nullptr;
       return;
@@ -200,7 +200,7 @@ public:
 
     // Push events arrived before setting the the executor callback
     for(uint64_t i = 0; i < unread_count_; i++) {
-      listener_callback_(executor_context_, { client_handle_, CLIENT_EVENT });
+      listener_callback_(callback_context_, { client_handle_, CLIENT_EVENT });
     }
 
     // Reset unread count
@@ -229,7 +229,7 @@ private:
 
   rmw_listener_cb_t listener_callback_{nullptr};
   const void * client_handle_{nullptr};
-  const void * executor_context_{nullptr};
+  const void * callback_context_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

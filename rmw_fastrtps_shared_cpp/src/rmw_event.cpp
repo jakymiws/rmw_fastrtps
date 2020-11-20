@@ -70,7 +70,7 @@ __rmw_init_event(
 
 rmw_ret_t
 __rmw_event_set_listener_callback(
-  const void * executor_context,
+  const void * callback_context,
   rmw_listener_cb_t callback,
   const void * waitable_handle,
   rmw_event_t * rmw_event,
@@ -78,7 +78,7 @@ __rmw_event_set_listener_callback(
 {
   auto custom_event_info = static_cast<CustomEventInfo *>(rmw_event->data);
   custom_event_info->getListener()->eventSetExecutorCallback(
-    executor_context,
+    callback_context,
     callback,
     waitable_handle,
     use_previous_events);

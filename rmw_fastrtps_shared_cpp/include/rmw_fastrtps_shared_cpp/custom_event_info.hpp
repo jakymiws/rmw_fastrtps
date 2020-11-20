@@ -70,13 +70,13 @@ public:
   // Provide handlers to perform an action when a
   // new event from this listener has ocurred
   virtual void eventSetExecutorCallback(
-    const void * executor_context,
+    const void * callback_context,
     rmw_listener_cb_t callback,
     const void * waitable_handle,
     bool use_previous_events) = 0;
 
   rmw_listener_cb_t listener_callback_{nullptr};
-  const void * executor_context_{nullptr};
+  const void * callback_context_{nullptr};
   const void * waitable_handle_{nullptr};
   uint64_t unread_events_count_ = 0;
   std::mutex listener_callback_mutex_;

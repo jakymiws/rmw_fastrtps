@@ -49,7 +49,7 @@ __rmw_destroy_guard_condition(rmw_guard_condition_t * guard_condition)
 
 rmw_ret_t
 __rmw_guard_condition_set_listener_callback(
-  const void * executor_context,
+  const void * callback_context,
   rmw_listener_cb_t callback,
   const void * guard_condition_handle,
   rmw_guard_condition_t * rmw_guard_condition,
@@ -57,7 +57,7 @@ __rmw_guard_condition_set_listener_callback(
 {
   auto guard_condition = static_cast<GuardCondition *>(rmw_guard_condition->data);
   guard_condition->guardConditionSetExecutorCallback(
-    executor_context,
+    callback_context,
     callback,
     guard_condition_handle,
     use_previous_events);

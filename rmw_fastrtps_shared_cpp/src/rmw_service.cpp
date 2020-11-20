@@ -99,9 +99,9 @@ __rmw_service_set_events_executor_callback(
   const void * executor_context,
   EventsExecutorCallback callback,
   const void * service_handle,
-  void * rmw_service)
+  rmw_service_t * rmw_service)
 {
-  auto custom_service_info = static_cast<CustomServiceInfo *>(rmw_service);
+  auto custom_service_info = static_cast<CustomServiceInfo *>(rmw_service->data);
   custom_service_info->listener_->serviceSetExecutorCallback(
     executor_context,
     callback,

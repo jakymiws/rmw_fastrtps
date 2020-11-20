@@ -30,8 +30,9 @@
 #include "fastrtps/subscriber/SubscriberListener.h"
 #include "fastrtps/subscriber/SampleInfo.h"
 
-#include "rcutils/executor_event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
+
+#include "rmw/executor_event_types.h"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
 #include "rmw_fastrtps_shared_cpp/guid_utils.hpp"

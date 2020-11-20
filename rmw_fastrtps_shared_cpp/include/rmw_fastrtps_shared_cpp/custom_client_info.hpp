@@ -32,8 +32,9 @@
 #include "fastrtps/publisher/Publisher.h"
 #include "fastrtps/publisher/PublisherListener.h"
 
-#include "rcutils/executor_event_types.h"
 #include "rcpputils/thread_safety_annotations.hpp"
+
+#include "rmw/executor_event_types.h"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
 

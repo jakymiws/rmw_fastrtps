@@ -26,8 +26,8 @@
 
 #include "rcpputils/thread_safety_annotations.hpp"
 
-#include "rmw/executor_event_types.h"
 #include "rmw/impl/cpp/macros.hpp"
+#include "rmw/listener_event_types.h"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
 #include "rmw_fastrtps_shared_cpp/custom_event_info.hpp"
@@ -85,10 +85,10 @@ public:
   onNewDataMessage(eprosima::fastrtps::Subscriber * sub) final
   {
     // Callback: add the subscription event to the event queue
-    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+    std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-    if(executor_callback_) {
-      executor_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
+    if(listener_callback_) {
+      listener_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
     } else {
       update_unread_count(sub);
       new_data_unread_count_++;
@@ -115,7 +115,7 @@ public:
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
   void eventSetExecutorCallback(
     const void * executor_context,
-    EventsExecutorCallback callback,
+    rmw_listener_cb_t callback,
     const void * waitable_handle,
     bool use_previous_events) final;
 
@@ -173,27 +173,27 @@ public:
   void
   subcriptionSetExecutorCallback(
     const void * executor_context,
-    EventsExecutorCallback callback,
+    rmw_listener_cb_t callback,
     const void * subscription_handle)
   {
-    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+    std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
     if(executor_context && subscription_handle && callback)
     {
       executor_context_ = executor_context;
-      executor_callback_ = callback;
+      listener_callback_ = callback;
       subscription_handle_ = subscription_handle;
     } else {
       // Unset callback: If any of the pointers is NULL, do not use callback.
       executor_context_ = nullptr;
-      executor_callback_ = nullptr;
+      listener_callback_ = nullptr;
       subscription_handle_ = nullptr;
       return;
     }
 
     // Push events arrived before setting the executor's callback
     for(uint64_t i = 0; i < new_data_unread_count_; i++) {
-      executor_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
+      listener_callback_(executor_context_, { subscription_handle_, SUBSCRIPTION_EVENT });
     }
 
     // Reset unread count
@@ -218,7 +218,7 @@ private:
 
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  ExecutorEvent subscription_event_{nullptr, SUBSCRIPTION_EVENT};
+  rmw_listener_event_t subscription_event_{nullptr, SUBSCRIPTION_EVENT};
   const void * subscription_handle_;
   uint64_t new_data_unread_count_ = 0;
 };

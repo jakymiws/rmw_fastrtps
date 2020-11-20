@@ -97,7 +97,7 @@ __rmw_destroy_service(
 rmw_ret_t
 __rmw_service_set_listener_callback(
   const void * executor_context,
-  EventsExecutorCallback callback,
+  rmw_listener_cb_t callback,
   const void * service_handle,
   rmw_service_t * rmw_service)
 {

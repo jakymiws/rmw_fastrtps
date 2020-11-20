@@ -24,7 +24,7 @@
 
 #include "rcpputils/thread_safety_annotations.hpp"
 
-#include "rmw/executor_event_types.h"
+#include "rmw/listener_event_types.h"
 
 class GuardCondition
 {
@@ -36,11 +36,11 @@ public:
   void
   trigger()
   {
-    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+    std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-    if(executor_callback_)
+    if(listener_callback_)
     {
-      executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
+      listener_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
     } else {
       std::lock_guard<std::mutex> lock(internalMutex_);
 
@@ -93,21 +93,21 @@ public:
   void
   guardConditionSetExecutorCallback(
     const void * executor_context,
-    EventsExecutorCallback callback,
+    rmw_listener_cb_t callback,
     const void * waitable_handle,
     bool use_previous_events)
   {
-    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+    std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
     if(executor_context && waitable_handle && callback)
     {
       executor_context_ = executor_context;
-      executor_callback_ = callback;
+      listener_callback_ = callback;
       waitable_handle_ = waitable_handle;
     } else {
       // Unset callback: If any of the pointers is NULL, do not use callback.
       executor_context_ = nullptr;
-      executor_callback_ = nullptr;
+      listener_callback_ = nullptr;
       waitable_handle_ = nullptr;
       return;
     }
@@ -115,7 +115,7 @@ public:
     if (use_previous_events) {
       // Push events arrived before setting the executor's callback
       for(uint64_t i = 0; i < unread_count_; i++) {
-        executor_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
+        listener_callback_(executor_context_, { waitable_handle_, WAITABLE_EVENT });
       }
     }
 
@@ -129,10 +129,10 @@ private:
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  EventsExecutorCallback executor_callback_{nullptr};
+  rmw_listener_cb_t listener_callback_{nullptr};
   const void * waitable_handle_{nullptr};
   const void * executor_context_{nullptr};
-  std::mutex executor_callback_mutex_;
+  std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };
 

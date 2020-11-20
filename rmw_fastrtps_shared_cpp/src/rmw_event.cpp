@@ -71,7 +71,7 @@ __rmw_init_event(
 rmw_ret_t
 __rmw_event_set_listener_callback(
   const void * executor_context,
-  EventsExecutorCallback callback,
+  rmw_listener_cb_t callback,
   const void * waitable_handle,
   rmw_event_t * rmw_event,
   bool use_previous_events)

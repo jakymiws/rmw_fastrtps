@@ -110,7 +110,7 @@ __rmw_subscription_get_actual_qos(
 rmw_ret_t
 __rmw_subscription_set_listener_callback(
   const void * executor_context,
-  EventsExecutorCallback callback,
+  rmw_listener_cb_t callback,
   const void * subscription_handle,
   rmw_subscription_t * rmw_subscription)
 {

@@ -34,7 +34,7 @@
 
 #include "rcpputils/thread_safety_annotations.hpp"
 
-#include "rmw/executor_event_types.h"
+#include "rmw/listener_event_types.h"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
 
@@ -111,10 +111,10 @@ public:
           }
 
           // Add the client event to the event queue
-          std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+          std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-          if(executor_callback_) {
-            executor_callback_(executor_context_, { client_handle_, CLIENT_EVENT });
+          if(listener_callback_) {
+            listener_callback_(executor_context_, { client_handle_, CLIENT_EVENT });
           } else {
             unread_count_++;
           }
@@ -180,27 +180,27 @@ public:
   void
   clientSetExecutorCallback(
     const void * executor_context,
-    EventsExecutorCallback callback,
+    rmw_listener_cb_t callback,
     const void * client_handle)
   {
-    std::unique_lock<std::mutex> lock_mutex(executor_callback_mutex_);
+    std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
     if(executor_context && client_handle && callback)
     {
       executor_context_ = executor_context;
-      executor_callback_ = callback;
+      listener_callback_ = callback;
       client_handle_ = client_handle;
     } else {
        // Unset callback: If any of the pointers is NULL, do not use callback.
       executor_context_ = nullptr;
-      executor_callback_ = nullptr;
+      listener_callback_ = nullptr;
       client_handle_ = nullptr;
       return;
     }
 
     // Push events arrived before setting the the executor callback
     for(uint64_t i = 0; i < unread_count_; i++) {
-      executor_callback_(executor_context_, { client_handle_, CLIENT_EVENT });
+      listener_callback_(executor_context_, { client_handle_, CLIENT_EVENT });
     }
 
     // Reset unread count
@@ -227,10 +227,10 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_;
 
-  EventsExecutorCallback executor_callback_{nullptr};
+  rmw_listener_cb_t listener_callback_{nullptr};
   const void * client_handle_{nullptr};
   const void * executor_context_{nullptr};
-  std::mutex executor_callback_mutex_;
+  std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };
 

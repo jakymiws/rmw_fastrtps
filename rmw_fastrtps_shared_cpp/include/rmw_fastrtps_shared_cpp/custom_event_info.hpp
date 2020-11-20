@@ -32,7 +32,7 @@
 #include "fastrtps/publisher/PublisherListener.h"
 
 #include "rmw/event.h"
-#include "rmw/executor_event_types.h"
+#include "rmw/listener_event_types.h"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
 
@@ -71,15 +71,15 @@ public:
   // new event from this listener has ocurred
   virtual void eventSetExecutorCallback(
     const void * executor_context,
-    EventsExecutorCallback callback,
+    rmw_listener_cb_t callback,
     const void * waitable_handle,
     bool use_previous_events) = 0;
 
-  EventsExecutorCallback executor_callback_{nullptr};
+  rmw_listener_cb_t listener_callback_{nullptr};
   const void * executor_context_{nullptr};
   const void * waitable_handle_{nullptr};
   uint64_t unread_events_count_ = 0;
-  std::mutex executor_callback_mutex_;
+  std::mutex listener_callback_mutex_;
 };
 
 class EventListenerInterface::ConditionalScopedLock

@@ -43,7 +43,7 @@ PubListener::on_offered_deadline_missed(
   std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
   if(listener_callback_){
-    listener_callback_(callback_context_, { waitable_handle_, WAITABLE_EVENT });
+    listener_callback_(user_data_, { waitable_handle_, WAITABLE_EVENT });
   } else {
     unread_events_count_++;
   }
@@ -70,7 +70,7 @@ void PubListener::on_liveliness_lost(
   std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
   if(listener_callback_) {
-    listener_callback_(callback_context_, { waitable_handle_, WAITABLE_EVENT });
+    listener_callback_(user_data_, { waitable_handle_, WAITABLE_EVENT });
   } else {
     unread_events_count_++;
   }
@@ -91,21 +91,21 @@ bool PubListener::hasEvent(rmw_event_type_t event_type) const
 }
 
 void PubListener::eventSetExecutorCallback(
-    const void * callback_context,
+    const void * user_data,
     rmw_listener_cb_t callback,
     const void * waitable_handle,
     bool use_previous_events)
 {
   std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-  if(callback_context && waitable_handle && callback)
+  if(user_data && waitable_handle && callback)
   {
-    callback_context_ = callback_context;
+    user_data_ = user_data;
     listener_callback_ = callback;
     waitable_handle_ = waitable_handle;
   } else {
     // Unset callback: If any of the pointers is NULL, do not use callback.
-    callback_context_ = nullptr;
+    user_data_ = nullptr;
     listener_callback_ = nullptr;
     waitable_handle_ = nullptr;
     return;
@@ -114,7 +114,7 @@ void PubListener::eventSetExecutorCallback(
   if (use_previous_events) {
     // Push events arrived before setting the executor's callback
     for(uint64_t i = 0; i < unread_events_count_; i++) {
-      listener_callback_(callback_context_, { waitable_handle_, WAITABLE_EVENT });
+      listener_callback_(user_data_, { waitable_handle_, WAITABLE_EVENT });
     }
   }
 

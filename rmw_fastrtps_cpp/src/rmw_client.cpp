@@ -335,13 +335,13 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
 
 rmw_ret_t
 rmw_client_set_listener_callback(
-  const void * callback_context,
+  const void * user_data,
   rmw_listener_cb_t callback,
   const void * client_handle,
   rmw_client_t * rmw_client)
 {
   return rmw_fastrtps_shared_cpp::__rmw_client_set_listener_callback(
-    callback_context,
+    user_data,
     callback,
     client_handle,
     rmw_client);

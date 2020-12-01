@@ -50,14 +50,14 @@ rmw_subscription_event_init(
 
 rmw_ret_t
 rmw_event_set_listener_callback(
-  const void * callback_context,
+  const void * user_data,
   rmw_listener_cb_t callback,
   const void * waitable_handle,
   rmw_event_t * rmw_event,
   bool use_previous_events)
 {
   return rmw_fastrtps_shared_cpp::__rmw_event_set_listener_callback(
-    callback_context,
+    user_data,
     callback,
     waitable_handle,
     rmw_event,

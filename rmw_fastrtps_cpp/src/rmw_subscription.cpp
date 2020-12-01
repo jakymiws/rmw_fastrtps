@@ -170,13 +170,13 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
 
 rmw_ret_t
 rmw_subscription_set_listener_callback(
-  const void * callback_context,
+  const void * user_data,
   rmw_listener_cb_t callback,
   const void * subscription_handle,
   rmw_subscription_t * rmw_subscription)
 {
   return rmw_fastrtps_shared_cpp::__rmw_subscription_set_listener_callback(
-    callback_context,
+    user_data,
     callback,
     subscription_handle,
     rmw_subscription);

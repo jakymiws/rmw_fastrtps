@@ -117,7 +117,7 @@ public:
         std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
         if(listener_callback_) {
-          listener_callback_(callback_context_, { service_handle_, SERVICE_EVENT });
+          listener_callback_(user_data_, { service_handle_, SERVICE_EVENT });
         } else {
           unread_count_++;
         }
@@ -175,20 +175,20 @@ public:
   // new event from this listener has ocurred
   void
   serviceSetExecutorCallback(
-    const void * callback_context,
+    const void * user_data,
     rmw_listener_cb_t callback,
     const void * service_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-    if(callback_context && service_handle && callback)
+    if(user_data && service_handle && callback)
     {
-      callback_context_ = callback_context;
+      user_data_ = user_data;
       listener_callback_ = callback;
       service_handle_ = service_handle;
     } else {
        // Unset callback: If any of the pointers is NULL, do not use callback.
-      callback_context_ = nullptr;
+      user_data_ = nullptr;
       listener_callback_ = nullptr;
       service_handle_ = nullptr;
       return;
@@ -196,7 +196,7 @@ public:
 
     // Push events arrived before setting the the executor callback
     for(uint64_t i = 0; i < unread_count_; i++) {
-      listener_callback_(callback_context_, { service_handle_, SERVICE_EVENT });
+      listener_callback_(user_data_, { service_handle_, SERVICE_EVENT });
     }
 
     // Reset unread count
@@ -213,7 +213,7 @@ private:
 
   rmw_listener_cb_t listener_callback_{nullptr};
   const void * service_handle_{nullptr};
-  const void * callback_context_{nullptr};
+  const void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

@@ -109,10 +109,10 @@ __rmw_subscription_get_actual_qos(
 
 rmw_ret_t
 __rmw_subscription_set_listener_callback(
-  const void * user_data,
+  rmw_subscription_t * rmw_subscription,
   rmw_listener_cb_t callback,
-  const void * subscription_handle,
-  rmw_subscription_t * rmw_subscription)
+  const void * user_data,
+  const void * subscription_handle)
 {
   auto custom_subscriber_info = static_cast<CustomSubscriberInfo *>(rmw_subscription->data);
   custom_subscriber_info->listener_->subcriptionSetExecutorCallback(

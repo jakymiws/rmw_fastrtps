@@ -170,15 +170,15 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
 
 rmw_ret_t
 rmw_subscription_set_listener_callback(
-  const void * user_data,
+  rmw_subscription_t * rmw_subscription,
   rmw_listener_cb_t callback,
-  const void * subscription_handle,
-  rmw_subscription_t * rmw_subscription)
+  const void * user_data,
+  const void * subscription_handle)
 {
   return rmw_fastrtps_shared_cpp::__rmw_subscription_set_listener_callback(
-    user_data,
+    rmw_subscription,
     callback,
-    subscription_handle,
-    rmw_subscription);
+    user_data,
+    subscription_handle);
 }
 }  // extern "C"

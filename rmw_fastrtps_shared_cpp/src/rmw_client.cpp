@@ -83,10 +83,10 @@ __rmw_destroy_client(
 
 rmw_ret_t
 __rmw_client_set_listener_callback(
-  const void * user_data,
+  rmw_client_t * rmw_client,
   rmw_listener_cb_t callback,
-  const void * client_handle,
-  rmw_client_t * rmw_client)
+  const void * user_data,
+  const void * client_handle)
 {
   auto custom_client_info = static_cast<CustomClientInfo *>(rmw_client->data);
   custom_client_info->listener_->clientSetExecutorCallback(

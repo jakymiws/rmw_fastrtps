@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "rcpputils/scope_exit.hpp"
+#include "rcutils/error_handling.h"
 #include "rcutils/logging_macros.h"
 
 #include "rmw/allocators.h"
@@ -46,10 +47,14 @@
 
 #include "type_support_common.hpp"
 
+#include "fastrtps/xmlparser/XMLProfileManager.h"
+
 using Domain = eprosima::fastrtps::Domain;
 using Participant = eprosima::fastrtps::Participant;
 using TopicDataType = eprosima::fastrtps::TopicDataType;
 using CustomParticipantInfo = CustomParticipantInfo;
+using XMLProfileManager = eprosima::fastrtps::xmlparser::XMLProfileManager;
+using XMLP_ret = eprosima::fastrtps::xmlparser::XMLP_ret;
 
 extern "C"
 {
@@ -93,10 +98,19 @@ rmw_create_service(
   const rosidl_service_type_support_t * type_support = get_service_typesupport_handle(
     type_supports, RMW_FASTRTPS_CPP_TYPESUPPORT_C);
   if (!type_support) {
+    rcutils_error_string_t prev_error_string = rcutils_get_error_string();
+    rcutils_reset_error();
     type_support = get_service_typesupport_handle(
       type_supports, RMW_FASTRTPS_CPP_TYPESUPPORT_CPP);
     if (!type_support) {
-      RMW_SET_ERROR_MSG("type support not from this implementation");
+      rcutils_error_string_t error_string = rcutils_get_error_string();
+      rcutils_reset_error();
+      RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+        "Type support not from this implementation. Got:\n"
+        "    %s\n"
+        "    %s\n"
+        "while fetching it",
+        prev_error_string.str, error_string.str);
       return nullptr;
     }
   }
@@ -116,6 +130,7 @@ rmw_create_service(
       }
       delete info;
     });
+
   info->participant_ = participant;
   info->typesupport_identifier_ = type_support->typesupport_identifier;
 
@@ -161,8 +176,20 @@ rmw_create_service(
     _register_type(participant, info->response_type_support_);
   }
 
+  // If FASTRTPS_DEFAULT_PROFILES_FILE defined, fill subscriber attributes with a subscriber profile
+  // located based of topic name defined by _create_topic_name(). If no profile is found, a search
+  // with profile_name "service" is attempted. Else, use the default attributes.
+  std::string topic_name_fallback = "service";
   eprosima::fastrtps::SubscriberAttributes subscriberParam;
-  eprosima::fastrtps::PublisherAttributes publisherParam;
+  eprosima::fastrtps::fixed_string<255> sub_topic_name = _create_topic_name(
+    qos_policies, ros_service_requester_prefix, service_name, "Request");
+  Domain::getDefaultSubscriberAttributes(subscriberParam);
+
+  if (XMLProfileManager::fillSubscriberAttributes(
+      sub_topic_name.to_string(), subscriberParam, false) != XMLP_ret::XML_OK)
+  {
+    XMLProfileManager::fillSubscriberAttributes(topic_name_fallback, subscriberParam, false);
+  }
 
   if (!impl->leave_middleware_default_qos) {
     subscriberParam.historyMemoryPolicy =
@@ -170,19 +197,35 @@ rmw_create_service(
   }
   subscriberParam.topic.topicKind = eprosima::fastrtps::rtps::NO_KEY;
   subscriberParam.topic.topicDataType = request_type_name;
-  subscriberParam.topic.topicName = _create_topic_name(
-    qos_policies, ros_service_requester_prefix, service_name, "Request");
+  subscriberParam.topic.topicName = sub_topic_name;
+
+  // If FASTRTPS_DEFAULT_PROFILES_FILE defined, fill publisher attributes with a publisher profile
+  // located based of topic name defined by _create_topic_name(). If no profile is found, a search
+  // with profile_name "service" is attempted. Else, use the default attributes.
+  eprosima::fastrtps::fixed_string<255> pub_topic_name = _create_topic_name(
+    qos_policies, ros_service_response_prefix, service_name, "Reply");
+  eprosima::fastrtps::PublisherAttributes publisherParam;
+  Domain::getDefaultPublisherAttributes(publisherParam);
+
+  if (XMLProfileManager::fillPublisherAttributes(
+      pub_topic_name.to_string(), publisherParam, false) != XMLP_ret::XML_OK)
+  {
+    XMLProfileManager::fillPublisherAttributes(topic_name_fallback, publisherParam, false);
+  }
 
   if (!impl->leave_middleware_default_qos) {
-    publisherParam.qos.m_publishMode.kind = eprosima::fastrtps::ASYNCHRONOUS_PUBLISH_MODE;
     publisherParam.historyMemoryPolicy =
       eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
+    if (impl->publishing_mode == publishing_mode_t::ASYNCHRONOUS) {
+      publisherParam.qos.m_publishMode.kind = eprosima::fastrtps::ASYNCHRONOUS_PUBLISH_MODE;
+    } else if (impl->publishing_mode == publishing_mode_t::SYNCHRONOUS) {
+      publisherParam.qos.m_publishMode.kind = eprosima::fastrtps::SYNCHRONOUS_PUBLISH_MODE;
+    }
   }
 
   publisherParam.topic.topicKind = eprosima::fastrtps::rtps::NO_KEY;
   publisherParam.topic.topicDataType = response_type_name;
-  publisherParam.topic.topicName = _create_topic_name(
-    qos_policies, ros_service_response_prefix, service_name, "Reply");
+  publisherParam.topic.topicName = pub_topic_name;
 
   RCUTILS_LOG_DEBUG_NAMED(
     "rmw_fastrtps_cpp",

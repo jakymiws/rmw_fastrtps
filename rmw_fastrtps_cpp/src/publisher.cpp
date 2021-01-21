@@ -17,7 +17,9 @@
 
 #include "fastrtps/Domain.h"
 #include "fastrtps/participant/Participant.h"
+#include "fastrtps/xmlparser/XMLProfileManager.h"
 
+#include "rcutils/error_handling.h"
 #include "rcutils/macros.h"
 
 #include "rmw/allocators.h"
@@ -43,6 +45,7 @@
 using Domain = eprosima::fastrtps::Domain;
 using Participant = eprosima::fastrtps::Participant;
 using TopicDataType = eprosima::fastrtps::TopicDataType;
+using XMLProfileManager = eprosima::fastrtps::xmlparser::XMLProfileManager;
 
 rmw_publisher_t *
 rmw_fastrtps_cpp::create_publisher(
@@ -84,24 +87,36 @@ rmw_fastrtps_cpp::create_publisher(
   const rosidl_message_type_support_t * type_support = get_message_typesupport_handle(
     type_supports, RMW_FASTRTPS_CPP_TYPESUPPORT_C);
   if (!type_support) {
+    rcutils_error_string_t prev_error_string = rcutils_get_error_string();
+    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, RMW_FASTRTPS_CPP_TYPESUPPORT_CPP);
     if (!type_support) {
-      RMW_SET_ERROR_MSG("type support not from this implementation");
+      rcutils_error_string_t error_string = rcutils_get_error_string();
+      rcutils_reset_error();
+      RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+        "Type support not from this implementation. Got:\n"
+        "    %s\n"
+        "    %s\n"
+        "while fetching it",
+        prev_error_string.str, error_string.str);
       return nullptr;
     }
   }
 
   CustomPublisherInfo * info = nullptr;
   rmw_publisher_t * rmw_publisher = nullptr;
-  eprosima::fastrtps::PublisherAttributes publisherParam;
 
   if (!is_valid_qos(*qos_policies)) {
     return nullptr;
   }
 
-  // Load default XML profile.
-  Domain::getDefaultPublisherAttributes(publisherParam);
+  // If the user defined an XML file via env "FASTRTPS_DEFAULT_PROFILES_FILE", try to load
+  // publisher which profile name matches with topic_name. If such profile does not exist,
+  // then use the default attributes.
+  eprosima::fastrtps::PublisherAttributes publisherParam;
+  Domain::getDefaultPublisherAttributes(publisherParam);  // Loads the XML file if not loaded
+  XMLProfileManager::fillPublisherAttributes(topic_name, publisherParam, false);
 
   info = new (std::nothrow) CustomPublisherInfo();
   if (!info) {
@@ -135,9 +150,13 @@ rmw_fastrtps_cpp::create_publisher(
   }
 
   if (!participant_info->leave_middleware_default_qos) {
-    publisherParam.qos.m_publishMode.kind = eprosima::fastrtps::ASYNCHRONOUS_PUBLISH_MODE;
     publisherParam.historyMemoryPolicy =
       eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
+    if (participant_info->publishing_mode == publishing_mode_t::ASYNCHRONOUS) {
+      publisherParam.qos.m_publishMode.kind = eprosima::fastrtps::ASYNCHRONOUS_PUBLISH_MODE;
+    } else if (participant_info->publishing_mode == publishing_mode_t::SYNCHRONOUS) {
+      publisherParam.qos.m_publishMode.kind = eprosima::fastrtps::SYNCHRONOUS_PUBLISH_MODE;
+    }
   }
 
   publisherParam.topic.topicKind =

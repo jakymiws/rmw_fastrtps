@@ -16,6 +16,7 @@
 #include <utility>
 
 #include "rcutils/allocator.h"
+#include "rcutils/error_handling.h"
 #include "rcutils/macros.h"
 #include "rcutils/strdup.h"
 
@@ -35,6 +36,7 @@
 
 #include "fastrtps/participant/Participant.h"
 #include "fastrtps/subscriber/Subscriber.h"
+#include "fastrtps/xmlparser/XMLProfileManager.h"
 
 #include "rmw_fastrtps_cpp/identifier.hpp"
 #include "rmw_fastrtps_cpp/subscription.hpp"
@@ -44,7 +46,7 @@
 using Domain = eprosima::fastrtps::Domain;
 using Participant = eprosima::fastrtps::Participant;
 using TopicDataType = eprosima::fastrtps::TopicDataType;
-
+using XMLProfileManager = eprosima::fastrtps::xmlparser::XMLProfileManager;
 
 namespace rmw_fastrtps_cpp
 {
@@ -88,10 +90,19 @@ create_subscription(
   const rosidl_message_type_support_t * type_support = get_message_typesupport_handle(
     type_supports, RMW_FASTRTPS_CPP_TYPESUPPORT_C);
   if (!type_support) {
+    rcutils_error_string_t prev_error_string = rcutils_get_error_string();
+    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, RMW_FASTRTPS_CPP_TYPESUPPORT_CPP);
     if (!type_support) {
-      RMW_SET_ERROR_MSG("type support not from this implementation");
+      rcutils_error_string_t error_string = rcutils_get_error_string();
+      rcutils_reset_error();
+      RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+        "Type support not from this implementation. Got:\n"
+        "    %s\n"
+        "    %s\n"
+        "while fetching it",
+        prev_error_string.str, error_string.str);
       return nullptr;
     }
   }
@@ -99,9 +110,12 @@ create_subscription(
     return nullptr;
   }
 
-  // Load default XML profile.
+  // If the user defined an XML file via env "FASTRTPS_DEFAULT_PROFILES_FILE", try to load
+  // subscriber which profile name matches with topic_name. If such profile does not exist, then use
+  // the default attributes.
   eprosima::fastrtps::SubscriberAttributes subscriberParam;
-  Domain::getDefaultSubscriberAttributes(subscriberParam);
+  Domain::getDefaultSubscriberAttributes(subscriberParam);  // Loads the XML file if not loaded
+  XMLProfileManager::fillSubscriberAttributes(topic_name, subscriberParam, false);
 
   CustomSubscriberInfo * info = new (std::nothrow) CustomSubscriberInfo();
   if (!info) {

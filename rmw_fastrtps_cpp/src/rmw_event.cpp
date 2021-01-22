@@ -50,17 +50,17 @@ rmw_subscription_event_init(
 
 rmw_ret_t
 rmw_event_set_listener_callback(
-  const void * user_data,
-  rmw_listener_cb_t callback,
-  const void * waitable_handle,
   rmw_event_t * rmw_event,
+  rmw_listener_cb_t callback,
+  const void * user_data,
+  const void * waitable_handle,
   bool use_previous_events)
 {
   return rmw_fastrtps_shared_cpp::__rmw_event_set_listener_callback(
-    user_data,
-    callback,
-    waitable_handle,
     rmw_event,
+    callback,
+    user_data,
+    waitable_handle,
     use_previous_events);
 }
 }  // extern "C"

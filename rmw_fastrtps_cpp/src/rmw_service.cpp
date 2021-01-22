@@ -384,15 +384,15 @@ rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
 
 rmw_ret_t
 rmw_service_set_listener_callback(
-  const void * user_data,
+  rmw_service_t * rmw_service,
   rmw_listener_cb_t callback,
-  const void * service_handle,
-  rmw_service_t * rmw_service)
+  const void * user_data,
+  const void * service_handle)
 {
   return rmw_fastrtps_shared_cpp::__rmw_service_set_listener_callback(
-    user_data,
+    rmw_service,
     callback,
-    service_handle,
-    rmw_service);
+    user_data,
+    service_handle);
 }
 }  // extern "C"

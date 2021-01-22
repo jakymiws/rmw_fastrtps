@@ -96,10 +96,10 @@ __rmw_destroy_service(
 
 rmw_ret_t
 __rmw_service_set_listener_callback(
-  const void * user_data,
+  rmw_service_t * rmw_service,
   rmw_listener_cb_t callback,
-  const void * service_handle,
-  rmw_service_t * rmw_service)
+  const void * user_data,
+  const void * service_handle)
 {
   auto custom_service_info = static_cast<CustomServiceInfo *>(rmw_service->data);
   custom_service_info->listener_->serviceSetExecutorCallback(

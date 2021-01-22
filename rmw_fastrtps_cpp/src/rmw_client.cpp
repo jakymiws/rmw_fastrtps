@@ -378,15 +378,15 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
 
 rmw_ret_t
 rmw_client_set_listener_callback(
-  const void * user_data,
+  rmw_client_t * rmw_client,
   rmw_listener_cb_t callback,
-  const void * client_handle,
-  rmw_client_t * rmw_client)
+  const void * user_data,
+  const void * client_handle)
 {
   return rmw_fastrtps_shared_cpp::__rmw_client_set_listener_callback(
-    user_data,
+    rmw_client,
     callback,
-    client_handle,
-    rmw_client);
+    user_data,
+    client_handle);
 }
 }  // extern "C"

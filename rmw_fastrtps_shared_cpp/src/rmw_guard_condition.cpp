@@ -50,7 +50,7 @@ __rmw_destroy_guard_condition(rmw_guard_condition_t * guard_condition)
 rmw_ret_t
 __rmw_guard_condition_set_listener_callback(
   rmw_guard_condition_t * rmw_guard_condition,
-  rmw_listener_cb_t callback,
+  rmw_listener_callback_t callback,
   const void * user_data,
   const void * guard_condition_handle,
   bool use_previous_events)

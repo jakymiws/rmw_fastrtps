@@ -51,7 +51,7 @@ rmw_subscription_event_init(
 rmw_ret_t
 rmw_event_set_listener_callback(
   rmw_event_t * rmw_event,
-  rmw_listener_cb_t callback,
+  rmw_listener_callback_t callback,
   const void * user_data,
   const void * waitable_handle,
   bool use_previous_events)

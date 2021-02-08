@@ -171,7 +171,7 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
 rmw_ret_t
 rmw_subscription_set_listener_callback(
   rmw_subscription_t * rmw_subscription,
-  rmw_listener_cb_t callback,
+  rmw_listener_callback_t callback,
   const void * user_data,
   const void * subscription_handle)
 {

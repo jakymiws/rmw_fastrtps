@@ -180,7 +180,7 @@ public:
   void
   clientSetExecutorCallback(
     const void * user_data,
-    rmw_listener_cb_t callback,
+    rmw_listener_callback_t callback,
     const void * client_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
@@ -227,7 +227,7 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_;
 
-  rmw_listener_cb_t listener_callback_{nullptr};
+  rmw_listener_callback_t listener_callback_{nullptr};
   const void * client_handle_{nullptr};
   const void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;

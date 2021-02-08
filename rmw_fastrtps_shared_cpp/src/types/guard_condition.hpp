@@ -93,7 +93,7 @@ public:
   void
   guardConditionSetExecutorCallback(
     const void * user_data,
-    rmw_listener_cb_t callback,
+    rmw_listener_callback_t callback,
     const void * waitable_handle,
     bool use_previous_events)
   {
@@ -129,7 +129,7 @@ private:
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  rmw_listener_cb_t listener_callback_{nullptr};
+  rmw_listener_callback_t listener_callback_{nullptr};
   const void * waitable_handle_{nullptr};
   const void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;

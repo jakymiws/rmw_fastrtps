@@ -84,7 +84,7 @@ __rmw_destroy_client(
 rmw_ret_t
 __rmw_client_set_listener_callback(
   rmw_client_t * rmw_client,
-  rmw_listener_cb_t callback,
+  rmw_listener_callback_t callback,
   const void * user_data,
   const void * client_handle)
 {

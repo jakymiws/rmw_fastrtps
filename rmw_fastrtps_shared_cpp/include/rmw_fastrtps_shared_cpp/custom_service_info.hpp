@@ -295,7 +295,7 @@ public:
   void
   serviceSetExecutorCallback(
     const void * user_data,
-    rmw_listener_cb_t callback,
+    rmw_listener_callback_t callback,
     const void * service_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
@@ -330,7 +330,7 @@ private:
   std::mutex * conditionMutex_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
-  rmw_listener_cb_t listener_callback_{nullptr};
+  rmw_listener_callback_t listener_callback_{nullptr};
   const void * service_handle_{nullptr};
   const void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;

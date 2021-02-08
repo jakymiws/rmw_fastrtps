@@ -115,7 +115,7 @@ public:
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
   void eventSetExecutorCallback(
     const void * user_data,
-    rmw_listener_cb_t callback,
+    rmw_listener_callback_t callback,
     const void * waitable_handle,
     bool use_previous_events) final;
 
@@ -173,7 +173,7 @@ public:
   void
   subcriptionSetExecutorCallback(
     const void * user_data,
-    rmw_listener_cb_t callback,
+    rmw_listener_callback_t callback,
     const void * subscription_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);

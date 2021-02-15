@@ -185,13 +185,11 @@ public:
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-    if(user_data && client_handle && callback)
-    {
+    if (callback) {
       user_data_ = user_data;
       listener_callback_ = callback;
       client_handle_ = client_handle;
     } else {
-       // Unset callback: If any of the pointers is NULL, do not use callback.
       user_data_ = nullptr;
       listener_callback_ = nullptr;
       client_handle_ = nullptr;

@@ -91,7 +91,7 @@ bool PubListener::hasEvent(rmw_event_type_t event_type) const
 }
 
 void PubListener::eventSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * waitable_handle,
     bool use_previous_events)

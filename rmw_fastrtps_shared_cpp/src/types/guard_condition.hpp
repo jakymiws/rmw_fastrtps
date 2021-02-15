@@ -92,7 +92,7 @@ public:
   // new event from this listener has ocurred
   void
   guardConditionSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * waitable_handle,
     bool use_previous_events)
@@ -129,7 +129,7 @@ private:
 
   rmw_listener_callback_t listener_callback_{nullptr};
   const void * waitable_handle_{nullptr};
-  const void * user_data_{nullptr};
+  void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

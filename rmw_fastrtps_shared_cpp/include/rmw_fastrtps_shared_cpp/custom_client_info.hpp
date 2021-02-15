@@ -179,7 +179,7 @@ public:
   // new event from this listener has ocurred
   void
   clientSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * client_handle)
   {
@@ -227,7 +227,7 @@ private:
 
   rmw_listener_callback_t listener_callback_{nullptr};
   const void * client_handle_{nullptr};
-  const void * user_data_{nullptr};
+  void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

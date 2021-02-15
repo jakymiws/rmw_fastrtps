@@ -114,7 +114,7 @@ public:
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
   void eventSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * waitable_handle,
     bool use_previous_events) final;
@@ -172,7 +172,7 @@ public:
   // new event from this listener has ocurred
   void
   subcriptionSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * subscription_handle)
   {

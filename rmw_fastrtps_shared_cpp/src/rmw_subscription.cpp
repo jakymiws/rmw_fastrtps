@@ -111,7 +111,7 @@ rmw_ret_t
 __rmw_subscription_set_listener_callback(
   rmw_subscription_t * rmw_subscription,
   rmw_listener_callback_t callback,
-  const void * user_data,
+  void * user_data,
   const void * subscription_handle)
 {
   auto custom_subscriber_info = static_cast<CustomSubscriberInfo *>(rmw_subscription->data);

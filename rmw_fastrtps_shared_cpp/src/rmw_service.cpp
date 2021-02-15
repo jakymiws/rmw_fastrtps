@@ -98,7 +98,7 @@ rmw_ret_t
 __rmw_service_set_listener_callback(
   rmw_service_t * rmw_service,
   rmw_listener_callback_t callback,
-  const void * user_data,
+  void * user_data,
   const void * service_handle)
 {
   auto custom_service_info = static_cast<CustomServiceInfo *>(rmw_service->data);

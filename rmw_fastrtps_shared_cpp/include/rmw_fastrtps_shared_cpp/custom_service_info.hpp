@@ -294,7 +294,7 @@ public:
   // new event from this listener has ocurred
   void
   serviceSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * service_handle)
   {
@@ -330,7 +330,7 @@ private:
 
   rmw_listener_callback_t listener_callback_{nullptr};
   const void * service_handle_{nullptr};
-  const void * user_data_{nullptr};
+  void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

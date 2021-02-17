@@ -93,20 +93,18 @@ bool SubListener::hasEvent(rmw_event_type_t event_type) const
 }
 
 void SubListener::eventSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * waitable_handle,
     bool use_previous_events)
 {
   std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-  if(user_data && waitable_handle && callback)
-  {
+  if (callback) {
     user_data_ = user_data;
     listener_callback_ = callback;
     waitable_handle_ = waitable_handle;
   } else {
-    // Unset callback: If any of the pointers is NULL, do not use callback.
     user_data_ = nullptr;
     listener_callback_ = nullptr;
     waitable_handle_ = nullptr;

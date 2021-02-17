@@ -114,7 +114,7 @@ public:
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
   void eventSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * waitable_handle,
     bool use_previous_events) final;
@@ -172,19 +172,17 @@ public:
   // new event from this listener has ocurred
   void
   subcriptionSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * subscription_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-    if(user_data && subscription_handle && callback)
-    {
+    if (callback) {
       user_data_ = user_data;
       listener_callback_ = callback;
       subscription_handle_ = subscription_handle;
     } else {
-      // Unset callback: If any of the pointers is NULL, do not use callback.
       user_data_ = nullptr;
       listener_callback_ = nullptr;
       subscription_handle_ = nullptr;

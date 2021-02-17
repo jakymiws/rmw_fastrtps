@@ -294,19 +294,17 @@ public:
   // new event from this listener has ocurred
   void
   serviceSetExecutorCallback(
-    const void * user_data,
+    void * user_data,
     rmw_listener_callback_t callback,
     const void * service_handle)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
-    if(user_data && service_handle && callback)
-    {
+    if (callback) {
       user_data_ = user_data;
       listener_callback_ = callback;
       service_handle_ = service_handle;
     } else {
-       // Unset callback: If any of the pointers is NULL, do not use callback.
       user_data_ = nullptr;
       listener_callback_ = nullptr;
       service_handle_ = nullptr;
@@ -332,7 +330,7 @@ private:
 
   rmw_listener_callback_t listener_callback_{nullptr};
   const void * service_handle_{nullptr};
-  const void * user_data_{nullptr};
+  void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

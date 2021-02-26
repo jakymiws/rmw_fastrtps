@@ -32,7 +32,7 @@
 #include "fastrtps/publisher/PublisherListener.h"
 
 #include "rmw/event.h"
-#include "rmw/listener_event_types.h"
+#include "rmw/listener_callback_type.h"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
 

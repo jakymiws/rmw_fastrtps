@@ -33,7 +33,7 @@
 
 #include "rcpputils/thread_safety_annotations.hpp"
 
-#include "rmw/listener_event_types.h"
+#include "rmw/listener_callback_type.h"
 
 #include "rmw_fastrtps_shared_cpp/TypeSupport.hpp"
 #include "rmw_fastrtps_shared_cpp/guid_utils.hpp"

@@ -380,13 +380,11 @@ rmw_ret_t
 rmw_client_set_listener_callback(
   rmw_client_t * rmw_client,
   rmw_listener_callback_t callback,
-  void * user_data,
-  const void * client_handle)
+  const void * user_data)
 {
   return rmw_fastrtps_shared_cpp::__rmw_client_set_listener_callback(
     rmw_client,
     callback,
-    user_data,
-    client_handle);
+    user_data);
 }
 }  // extern "C"

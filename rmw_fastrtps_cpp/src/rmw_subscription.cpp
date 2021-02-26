@@ -172,13 +172,11 @@ rmw_ret_t
 rmw_subscription_set_listener_callback(
   rmw_subscription_t * rmw_subscription,
   rmw_listener_callback_t callback,
-  void * user_data,
-  const void * subscription_handle)
+  const void * user_data)
 {
   return rmw_fastrtps_shared_cpp::__rmw_subscription_set_listener_callback(
     rmw_subscription,
     callback,
-    user_data,
-    subscription_handle);
+    user_data);
 }
 }  // extern "C"

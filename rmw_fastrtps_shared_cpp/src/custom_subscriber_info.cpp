@@ -43,7 +43,7 @@ SubListener::on_requested_deadline_missed(
   std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
   if(listener_callback_) {
-    listener_callback_(user_data_, { waitable_handle_, WAITABLE_EVENT });
+    listener_callback_(user_data_);
   } else {
     unread_events_count_++;
   }
@@ -72,7 +72,7 @@ void SubListener::on_liveliness_changed(
   std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
   if(listener_callback_) {
-    listener_callback_(user_data_, { waitable_handle_, WAITABLE_EVENT });
+    listener_callback_(user_data_);
   } else {
     unread_events_count_++;
   }
@@ -93,30 +93,25 @@ bool SubListener::hasEvent(rmw_event_type_t event_type) const
 }
 
 void SubListener::eventSetExecutorCallback(
-    void * user_data,
+    const void * user_data,
     rmw_listener_callback_t callback,
-    const void * waitable_handle,
     bool use_previous_events)
 {
   std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
   if (callback) {
+    if (use_previous_events) {
+      // Push events arrived before setting the executor's callback
+      for(uint64_t i = 0; i < unread_events_count_; i++) {
+        callback(user_data);
+      }
+    }
     user_data_ = user_data;
     listener_callback_ = callback;
-    waitable_handle_ = waitable_handle;
   } else {
     user_data_ = nullptr;
     listener_callback_ = nullptr;
-    waitable_handle_ = nullptr;
     return;
-  }
-
-
-  if (use_previous_events) {
-    // Push events arrived before setting the executor's callback
-    for(uint64_t i = 0; i < unread_events_count_; i++) {
-      listener_callback_(user_data_, { waitable_handle_, WAITABLE_EVENT });
-    }
   }
 
   // Reset unread count

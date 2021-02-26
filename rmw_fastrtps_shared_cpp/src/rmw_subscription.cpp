@@ -111,14 +111,12 @@ rmw_ret_t
 __rmw_subscription_set_listener_callback(
   rmw_subscription_t * rmw_subscription,
   rmw_listener_callback_t callback,
-  void * user_data,
-  const void * subscription_handle)
+  const void * user_data)
 {
   auto custom_subscriber_info = static_cast<CustomSubscriberInfo *>(rmw_subscription->data);
   custom_subscriber_info->listener_->subcriptionSetExecutorCallback(
     user_data,
-    callback,
-    subscription_handle);
+    callback);
   return RMW_RET_OK;
 }
 }  // namespace rmw_fastrtps_shared_cpp

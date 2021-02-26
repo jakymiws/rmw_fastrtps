@@ -114,7 +114,7 @@ public:
           std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
           if(listener_callback_) {
-            listener_callback_(user_data_, { client_handle_, CLIENT_EVENT });
+            listener_callback_(user_data_);
           } else {
             unread_count_++;
           }
@@ -179,26 +179,22 @@ public:
   // new event from this listener has ocurred
   void
   clientSetExecutorCallback(
-    void * user_data,
-    rmw_listener_callback_t callback,
-    const void * client_handle)
+    const void * user_data,
+    rmw_listener_callback_t callback)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
     if (callback) {
+      // Push events arrived before setting the the executor callback
+      for(uint64_t i = 0; i < unread_count_; i++) {
+        callback(user_data);
+      }
       user_data_ = user_data;
       listener_callback_ = callback;
-      client_handle_ = client_handle;
     } else {
       user_data_ = nullptr;
       listener_callback_ = nullptr;
-      client_handle_ = nullptr;
       return;
-    }
-
-    // Push events arrived before setting the the executor callback
-    for(uint64_t i = 0; i < unread_count_; i++) {
-      listener_callback_(user_data_, { client_handle_, CLIENT_EVENT });
     }
 
     // Reset unread count
@@ -226,8 +222,7 @@ private:
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_;
 
   rmw_listener_callback_t listener_callback_{nullptr};
-  const void * client_handle_{nullptr};
-  void * user_data_{nullptr};
+  const void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

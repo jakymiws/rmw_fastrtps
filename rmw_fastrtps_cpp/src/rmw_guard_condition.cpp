@@ -47,15 +47,13 @@ rmw_ret_t
 rmw_guard_condition_set_listener_callback(
   rmw_guard_condition_t * rmw_guard_condition,
   rmw_listener_callback_t callback,
-  void * user_data,
-  const void * guard_condition_handle,
+  const void * user_data,
   bool use_previous_events)
 {
   return rmw_fastrtps_shared_cpp::__rmw_guard_condition_set_listener_callback(
     rmw_guard_condition,
     callback,
     user_data,
-    guard_condition_handle,
     use_previous_events);
 }
 }  // extern "C"

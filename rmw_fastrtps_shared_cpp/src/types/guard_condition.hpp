@@ -40,7 +40,7 @@ public:
 
     if(listener_callback_)
     {
-      listener_callback_(user_data_, { waitable_handle_, WAITABLE_EVENT });
+      listener_callback_(user_data_);
     } else {
       std::lock_guard<std::mutex> lock(internalMutex_);
 
@@ -92,30 +92,27 @@ public:
   // new event from this listener has ocurred
   void
   guardConditionSetExecutorCallback(
-    void * user_data,
+    const void * user_data,
     rmw_listener_callback_t callback,
-    const void * waitable_handle,
     bool use_previous_events)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
     if (callback) {
+      if (use_previous_events) {
+        // Push events arrived before setting the executor's callback
+        for(uint64_t i = 0; i < unread_count_; i++) {
+          callback(user_data);
+        }
+      }
       user_data_ = user_data;
       listener_callback_ = callback;
-      waitable_handle_ = waitable_handle;
     } else {
       user_data_ = nullptr;
       listener_callback_ = nullptr;
-      waitable_handle_ = nullptr;
       return;
     }
 
-    if (use_previous_events) {
-      // Push events arrived before setting the executor's callback
-      for(uint64_t i = 0; i < unread_count_; i++) {
-        listener_callback_(user_data_, { waitable_handle_, WAITABLE_EVENT });
-      }
-    }
 
     // Reset unread count
     unread_count_ = 0;
@@ -128,8 +125,7 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
   rmw_listener_callback_t listener_callback_{nullptr};
-  const void * waitable_handle_{nullptr};
-  void * user_data_{nullptr};
+  const void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

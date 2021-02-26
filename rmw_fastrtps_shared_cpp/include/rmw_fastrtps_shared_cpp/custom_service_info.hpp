@@ -236,7 +236,7 @@ public:
         std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
         if(listener_callback_) {
-          listener_callback_(user_data_, { service_handle_, SERVICE_EVENT });
+          listener_callback_(user_data_);
         } else {
           unread_count_++;
         }
@@ -294,26 +294,23 @@ public:
   // new event from this listener has ocurred
   void
   serviceSetExecutorCallback(
-    void * user_data,
-    rmw_listener_callback_t callback,
-    const void * service_handle)
+    const void * user_data,
+    rmw_listener_callback_t callback)
   {
     std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
 
     if (callback) {
+      // Push events arrived before setting the the executor callback
+      for(uint64_t i = 0; i < unread_count_; i++) {
+        callback(user_data);
+      }
+
       user_data_ = user_data;
       listener_callback_ = callback;
-      service_handle_ = service_handle;
     } else {
       user_data_ = nullptr;
       listener_callback_ = nullptr;
-      service_handle_ = nullptr;
       return;
-    }
-
-    // Push events arrived before setting the the executor callback
-    for(uint64_t i = 0; i < unread_count_; i++) {
-      listener_callback_(user_data_, { service_handle_, SERVICE_EVENT });
     }
 
     // Reset unread count
@@ -329,8 +326,7 @@ private:
   std::condition_variable * conditionVariable_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
   rmw_listener_callback_t listener_callback_{nullptr};
-  const void * service_handle_{nullptr};
-  void * user_data_{nullptr};
+  const void * user_data_{nullptr};
   std::mutex listener_callback_mutex_;
   uint64_t unread_count_ = 0;
 };

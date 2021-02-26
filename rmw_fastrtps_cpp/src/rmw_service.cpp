@@ -386,13 +386,11 @@ rmw_ret_t
 rmw_service_set_listener_callback(
   rmw_service_t * rmw_service,
   rmw_listener_callback_t callback,
-  void * user_data,
-  const void * service_handle)
+  const void * user_data)
 {
   return rmw_fastrtps_shared_cpp::__rmw_service_set_listener_callback(
     rmw_service,
     callback,
-    user_data,
-    service_handle);
+    user_data);
 }
 }  // extern "C"

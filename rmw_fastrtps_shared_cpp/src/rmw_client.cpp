@@ -85,14 +85,12 @@ rmw_ret_t
 __rmw_client_set_listener_callback(
   rmw_client_t * rmw_client,
   rmw_listener_callback_t callback,
-  void * user_data,
-  const void * client_handle)
+  const void * user_data)
 {
   auto custom_client_info = static_cast<CustomClientInfo *>(rmw_client->data);
   custom_client_info->listener_->clientSetExecutorCallback(
     user_data,
-    callback,
-    client_handle);
+    callback);
   return RMW_RET_OK;
 }
 }  // namespace rmw_fastrtps_shared_cpp

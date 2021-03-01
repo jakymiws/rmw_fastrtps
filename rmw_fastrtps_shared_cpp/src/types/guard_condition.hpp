@@ -24,7 +24,7 @@
 
 #include "rcpputils/thread_safety_annotations.hpp"
 
-#include "rmw/listener_event_types.h"
+#include "rmw/listener_callback_type.h"
 
 class GuardCondition
 {

@@ -59,14 +59,14 @@ rmw_publish_loaned_message(
 rmw_ret_t
 rmw_notify_participant_dynamic_network_interface(rmw_node_t * node)
 {
-  eprosima::fastdds::dds::DomainParticipant * participant = rmw_fastrtps_cpp::get_domain_participant(node);
+  rmw_fastrtps_cpp::eprosima::fastdds::dds::DomainParticipant * participant = rmw_fastrtps_cpp::get_domain_participant(node);
 
   if (nullptr == participant)
   {
           return RMW_RET_ERROR;
   }
 
-  participant->set_qos(eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
+  participant->set_qos(rmw_fastrtps_cpp::eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
   return RMW_RET_OK;
 
 }

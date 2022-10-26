@@ -64,8 +64,8 @@ rmw_notify_participant_dynamic_network_interface(rmw_node_t * node)
   std::cout << "Pre set_qos" << std::endl;
   std::cout << "Name: " << participant->get_qos().name().to_string() << std::endl;
   std::cout << "ID: " << participant->get_qos().wire_protocol().participant_id << std::endl;
-  std::cout << "builtin.unicastMetatraffic size: " << participant->get_qos().wire_protocol().builtin.metatrafficUnicastLocatorList() << std::endl;
-  std::cout << "builtin.multicastMetatraffic size: " << participant->get_qos().wire_protocol().builtin.metatrafficMulticastLocatorList() << std::endl;
+  std::cout << "builtin.unicastMetatraffic size: " << participant->get_qos().wire_protocol().builtin.metatrafficUnicastLocatorList.size() << std::endl;
+  std::cout << "builtin.multicastMetatraffic size: " << participant->get_qos().wire_protocol().builtin.metatrafficMulticastLocatorList.size() << std::endl;
   std::cout << "portBase: " << participant->get_qos().wire_protocol().port.portBase << std::endl;
   std::cout << "domainIdGain: " << participant->get_qos().wire_protocol().port.domainIDGain << std::endl;
   std::cout << "participantIdGain: " << participant->get_qos().wire_protocol().port.participantIDGain << std::endl;

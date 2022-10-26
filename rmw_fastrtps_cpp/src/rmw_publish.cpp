@@ -59,9 +59,19 @@ rmw_publish_loaned_message(
 rmw_ret_t
 rmw_notify_participant_dynamic_network_interface(rmw_node_t * node)
 {
-  std::cout << "NOTIFYING PARTICIPANT = " << std::endl;
-
   eprosima::fastdds::dds::DomainParticipant * participant = rmw_fastrtps_cpp::get_domain_participant(node);
+
+  std::cout << "Pre set_qos" << std::endl;
+  std::cout << "Name: " << participant->get_qos().name().to_string() << std::endl;
+  std::cout << "ID: " << participant->get_qos().wire_protocol().participant_id << std::endl;
+  std::cout << "builtin.unicastMetatraffic size: " << participant->get_qos().wire_protocol().builtin.metatrafficUnicastLocatorList() << std::endl;
+  std::cout << "builtin.multicastMetatraffic size: " << participant->get_qos().wire_protocol().builtin.metatrafficMulticastLocatorList() << std::endl;
+  std::cout << "portBase: " << participant->get_qos().wire_protocol().port.portBase << std::endl;
+  std::cout << "domainIdGain: " << participant->get_qos().wire_protocol().port.domainIDGain << std::endl;
+  std::cout << "participantIdGain: " << participant->get_qos().wire_protocol().port.participantIDGain << std::endl;
+  std::cout << "default unicast list size: " << dpqos.wire_protocol().default_unicast_locator_list.size() << std::endl;
+  std::cout << "default multicast list size: " << dpqos.wire_protocol().default_multicast_locator_list.size() << std::endl;
+  std::cout << "user transport size: " << dpqos.transport().user_transports.size() << std::endl;
 
   if (nullptr == participant)
   {
@@ -70,9 +80,19 @@ rmw_notify_participant_dynamic_network_interface(rmw_node_t * node)
 
   participant->set_qos(eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
 
-  eprosima::fastdds::dds::DomainParticipantQos dpqos = participant->get_qos();
-  int s = dpqos.wire_protocol().default_unicast_locator_list.size();
-  std::cout << "DEFAULT UNICAST LOCATOR LIST SIZE = " << s << std::endl;
+  //eprosima::fastdds::dds::DomainParticipantQos dpqos = participant->get_qos();
+
+  std::cout << "After set_qos" << std::endl;
+  std::cout << "Name: " << participant->get_qos().name().to_string() << std::endl;
+  std::cout << "ID: " << participant->get_qos().wire_protocol().participant_id << std::endl;
+  std::cout << "builtin.unicastMetatraffic size: " << participant->get_qos().wire_protocol().builtin.metatrafficUnicastLocatorList() << std::endl;
+  std::cout << "builtin.multicastMetatraffic size: " << participant->get_qos().wire_protocol().builtin.metatrafficMulticastLocatorList() << std::endl;
+  std::cout << "portBase: " << participant->get_qos().wire_protocol().port.portBase << std::endl;
+  std::cout << "domainIdGain: " << participant->get_qos().wire_protocol().port.domainIDGain << std::endl;
+  std::cout << "participantIdGain: " << participant->get_qos().wire_protocol().port.participantIDGain << std::endl;
+  std::cout << "default unicast list size: " << dpqos.wire_protocol().default_unicast_locator_list.size() << std::endl;
+  std::cout << "default multicast list size: " << dpqos.wire_protocol().default_multicast_locator_list.size() << std::endl;
+  std::cout << "user transport size: " << dpqos.transport().user_transports.size() << std::endl;
   
   return RMW_RET_OK;
 

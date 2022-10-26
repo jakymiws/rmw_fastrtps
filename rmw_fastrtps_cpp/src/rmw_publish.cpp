@@ -59,18 +59,18 @@ rmw_publish_loaned_message(
 rmw_ret_t
 rmw_notify_participant_dynamic_network_interface(rmw_node_t * node)
 {
-  std::cout << "NOTIFYING PARTICIPANT = " << s << std::endl;
+  std::cout << "NOTIFYING PARTICIPANT = " << std::endl;
 
-  rmw_fastrtps_cpp::eprosima::fastdds::dds::DomainParticipant * participant = rmw_fastrtps_cpp::get_domain_participant(node);
+  eprosima::fastdds::dds::DomainParticipant * participant = rmw_fastrtps_cpp::get_domain_participant(node);
 
   if (nullptr == participant)
   {
     return RMW_RET_ERROR;
   }
 
-  participant->set_qos(rmw_fastrtps_cpp::eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
+  participant->set_qos(eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
 
-  rmw_fastrtps_cpp::eprosima::fastdds::dds::DomainParticipantQos dpqos = participant->get_qos();
+  eprosima::fastdds::dds::DomainParticipantQos dpqos = participant->get_qos();
   int s = dpqos.wire_protocol().default_unicast_locator_list.size();
   std::cout << "DEFAULT UNICAST LOCATOR LIST SIZE = " << s << std::endl;
   

@@ -90,9 +90,9 @@ rmw_notify_participant_dynamic_network_interface(rmw_node_t * node)
   std::cout << "portBase: " << participant->get_qos().wire_protocol().port.portBase << std::endl;
   std::cout << "domainIdGain: " << participant->get_qos().wire_protocol().port.domainIDGain << std::endl;
   std::cout << "participantIdGain: " << participant->get_qos().wire_protocol().port.participantIDGain << std::endl;
-  std::cout << "default unicast list size: " << dpqos.wire_protocol().default_unicast_locator_list.size() << std::endl;
-  std::cout << "default multicast list size: " << dpqos.wire_protocol().default_multicast_locator_list.size() << std::endl;
-  std::cout << "user transport size: " << dpqos.transport().user_transports.size() << std::endl;
+  std::cout << "default unicast list size: " << participant->get_qos().wire_protocol().default_unicast_locator_list.size() << std::endl;
+  std::cout << "default multicast list size: " << participant->get_qos().wire_protocol().default_multicast_locator_list.size() << std::endl;
+  std::cout << "user transport size: " << participant->get_qos().transport().user_transports.size() << std::endl;
   
   return RMW_RET_OK;
 

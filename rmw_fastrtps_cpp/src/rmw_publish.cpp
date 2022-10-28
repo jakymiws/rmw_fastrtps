@@ -80,8 +80,6 @@ rmw_notify_participant_dynamic_network_interface(rmw_node_t * node)
 
   participant->set_qos(eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
 
-  //eprosima::fastdds::dds::DomainParticipantQos dpqos = participant->get_qos();
-
   std::cout << "After set_qos" << std::endl;
   std::cout << "Name: " << participant->get_qos().name().to_string() << std::endl;
   std::cout << "ID: " << participant->get_qos().wire_protocol().participant_id << std::endl;

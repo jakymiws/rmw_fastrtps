@@ -57,6 +57,11 @@ __create_participant(
   size_t domain_id)
 {
   CustomParticipantInfo * participant_info = nullptr;
+  std::cout << "IN __create_participant with" << std::endl;
+  std::cout << "domain id = " << domain_id << std::endl;
+  std::cout << "publishing mode = " << publishing_mode << std::endl;
+  std::cout << "leave_middleware_default_qos = " << leave_middleware_default_qos << std::endl;
+
 
   /////
   // Create Custom Participant

@@ -60,7 +60,7 @@ init_context_impl(
   std::cout << "IN init_context_impl with the following:" << std::endl;
   std::cout << "context->actual_domain_id = " << context->actual_domain_id << std::endl;
   std::cout << "context->options.localhost_only = " << context->options.localhost_only << " == " << RMW_LOCALHOST_ONLY_ENABLED << std::endl;
-  std::cout << "context->options.localhost_only = " << context->options.enclave << std::endl;
+  std::cout << "context->options.enclave = " << context->options.enclave << std::endl;
 
   std::unique_ptr<CustomParticipantInfo, std::function<void(CustomParticipantInfo *)>>
   participant_info(

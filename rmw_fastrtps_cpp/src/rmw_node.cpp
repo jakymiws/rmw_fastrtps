@@ -127,15 +127,15 @@ rmw_node_get_graph_guard_condition(const rmw_node_t * node)
 rmw_ret_t
 rmw_notify_participant_dynamic_network_interface(rmw_context_t * context)
 {
-  auto impl = static_cast<CustomParticipantInfo *>(node->context->impl->participant_info);
-  rmw_fastrtps_cpp::eprosima::fastdds::dds::DomainParticipant * participant = impl->participant_;
+  auto impl = static_cast<CustomParticipantInfo *>(context->impl->participant_info);
+  eprosima::fastdds::dds::DomainParticipant * participant = impl->participant_;
 
   if (nullptr == participant)
   {
     return RMW_RET_ERROR;
   }
 
-  participant->set_qos(rmw_fastrtps_cpp::eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
+  participant->set_qos(eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
   return RMW_RET_OK;
 
 }

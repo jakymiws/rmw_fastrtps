@@ -40,7 +40,7 @@ get_domain_participant(rmw_node_t * node);
  *
  * \return rmw_ret_t non `NULL` value if successful, otherwise `NULL`
  */
-rmw_ret_t rmw_notify_participant_dynamic_network_interface(rmw_node_t * node);
+rmw_ret_t rmw_notify_participant_dynamic_network_interface(rmw_context_t * context);
 
 }  // namespace rmw_fastrtps_cpp
 

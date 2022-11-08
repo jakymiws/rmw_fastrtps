@@ -32,6 +32,7 @@
 
 #include "rmw_fastrtps_cpp/identifier.hpp"
 #include "rmw_fastrtps_cpp/init_rmw_context_impl.hpp"
+#include "rmw_fastrtps_cpp/get_participant.hpp"
 
 extern "C"
 {
@@ -121,4 +122,22 @@ rmw_node_get_graph_guard_condition(const rmw_node_t * node)
   return rmw_fastrtps_shared_cpp::__rmw_node_get_graph_guard_condition(
     node);
 }
+
+rmw_ret_t
+rmw_notify_participant_dynamic_network_interface(rmw_context_t * context)
+{
+  auto impl = static_cast<CustomParticipantInfo *>(node->context->impl->participant_info);
+  rmw_fastrtps_cpp::eprosima::fastdds::dds::DomainParticipant * participant = impl->participant_;
+
+  if (nullptr == participant)
+  {
+    return RMW_RET_ERROR;
+  }
+
+  participant->set_qos(rmw_fastrtps_cpp::eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT);
+  return RMW_RET_OK;
+
+}
+
 }  // extern "C"
+
